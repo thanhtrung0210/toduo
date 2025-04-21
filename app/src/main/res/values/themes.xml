@@ -1,0 +1,19 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Theme cơ bản -->
+    <style name="Base.Theme.Toduo" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:textColor">@color/color_black</item>
+        <item name="android:background">@color/color_white</item>
+    </style>
+
+    <!-- Theme mặc định (Xanh tím) -->
+    <style name="Theme.Toduo_Default" parent="Base.Theme.Toduo">
+        <item name="colorPrimary">@color/color_default_primary</item>
+        <item name="colorSecondary">@color/color_default_secondary</item>
+    </style>
+
+    <!-- Theme hồng -->
+    <style name="Theme.Toduo_Pink" parent="Base.Theme.Toduo">
+        <item name="colorPrimary">@color/color_pink_primary</item>
+        <item name="colorSecondary">@color/color_pink_secondary</item>
+    </style>
+</resources>

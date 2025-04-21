@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Theme mặc định -->
+    <color name="color_default_primary">#002795</color>
+    <color name="color_default_secondary">#D4B5FF</color>
+</resources>

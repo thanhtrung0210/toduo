@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_activity"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/color_default_primary"
+    android:orientation="vertical"
+    android:weightSum="10"
+    tools:context=".MainActivity">
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/main_view_pager"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="9" />
+
+    <!-- Bottom Navigation Custom -->
+
+    <LinearLayout
+        android:id="@+id/main_bottom_navigation"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="?attr/colorSecondary"
+        android:orientation="horizontal"
+        android:paddingHorizontal="8dp"
+        android:paddingVertical="4dp"
+        android:weightSum="6.5">
+
+        <LinearLayout
+            android:id="@+id/main_bn_button_todolist"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginVertical="4dp"
+            android:layout_weight="2.5"
+            android:background="@drawable/main_bn_bg_slected_tab"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="10dp"
+            android:weightSum="3">
+
+            <!-- Tools:ignore để tắt cảnh báo khi sử dụng android tint -->
+            <ImageView
+                android:id="@+id/main_bn_icon_todolist"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_weight="1"
+                android:src="@drawable/main_bn_todolist"
+                android:tint="?attr/colorSecondary"
+                android:background="@android:color/transparent"
+                tools:ignore="UseAppTint,UseCompatLoadingForDrawables" />
+
+            <TextView
+                android:id="@+id/main_bn_text_todolist"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:fontFamily="@font/playpensans_bold"
+                android:gravity="center"
+                android:text="Mục tiêu"
+                android:textColor="?attr/colorSecondary"
+                android:background="@android:color/transparent"
+                android:textSize="16sp"
+                android:visibility="visible" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/main_bn_button_diary"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_margin="4dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="8dp"
+            android:weightSum="3"
+            android:background="@android:color/transparent">
+
+            <!-- Tools:ignore để tắt cảnh báo khi sử dụng android tint -->
+            <ImageView
+                android:id="@+id/main_bn_icon_diary"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_weight="1"
+                android:src="@drawable/main_bn_diary"
+                android:tint="?attr/colorPrimary"
+                android:background="@android:color/transparent"
+                tools:ignore="UseAppTint,UseCompatLoadingForDrawables" />
+
+            <TextView
+                android:id="@+id/main_bn_text_diary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:fontFamily="@font/playpensans_bold"
+                android:gravity="center"
+                android:text="Nhật ký"
+                android:textColor="?attr/colorSecondary"
+                android:background="@android:color/transparent"
+                android:textSize="16sp"
+                android:visibility="gone" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/main_bn_button_savings"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_margin="4dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="8dp"
+            android:weightSum="3"
+            android:background="@android:color/transparent">
+
+            <!-- Tools:ignore để tắt cảnh báo khi sử dụng android tint -->
+            <ImageView
+                android:id="@+id/main_bn_icon_savings"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_weight="1"
+                android:src="@drawable/main_bn_savings"
+                android:tint="?attr/colorPrimary"
+                android:background="@android:color/transparent"
+                tools:ignore="UseAppTint,UseCompatLoadingForDrawables" />
+
+            <TextView
+                android:id="@+id/main_bn_text_savings"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:fontFamily="@font/playpensans_bold"
+                android:gravity="center"
+                android:text="Tiết kiệm"
+                android:textColor="?attr/colorSecondary"
+                android:background="@android:color/transparent"
+                android:textSize="16sp"
+                android:visibility="gone" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/main_bn_button_pet"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_margin="4dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="8dp"
+            android:weightSum="3"
+            android:background="@android:color/transparent">
+
+            <!-- Tools:ignore để tắt cảnh báo khi sử dụng android tint -->
+            <ImageView
+                android:id="@+id/main_bn_icon_pet"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_weight="1"
+                android:src="@drawable/main_bn_pet"
+                android:tint="?attr/colorPrimary"
+                android:background="@android:color/transparent"
+                tools:ignore="UseAppTint,UseCompatLoadingForDrawables" />
+
+            <TextView
+                android:id="@+id/main_bn_text_pet"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:fontFamily="@font/playpensans_bold"
+                android:gravity="center"
+                android:text="Thú cưng"
+                android:textColor="?attr/colorSecondary"
+                android:background="@android:color/transparent"
+                android:textSize="16sp"
+                android:visibility="gone" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/main_bn_button_profile"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_margin="4dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="8dp"
+            android:weightSum="3"
+            android:background="@android:color/transparent">
+
+            <!-- Tools:ignore để tắt cảnh báo khi sử dụng android tint -->
+            <ImageView
+                android:id="@+id/main_bn_icon_profile"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_weight="1"
+                android:src="@drawable/main_bn_profile"
+                android:tint="?attr/colorPrimary"
+                android:background="@android:color/transparent"
+                tools:ignore="UseAppTint,UseCompatLoadingForDrawables" />
+
+            <TextView
+                android:id="@+id/main_bn_text_profile"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="@font/playpensans_bold"
+                android:gravity="center"
+                android:text="Thông tin"
+                android:textColor="?attr/colorSecondary"
+                android:background="@android:color/transparent"
+                android:textSize="16sp"
+                android:visibility="gone" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

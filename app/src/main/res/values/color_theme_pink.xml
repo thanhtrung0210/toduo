@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Theme hồng -->
+    <color name="color_pink_primary">#FF7973</color>
+    <color name="color_pink_secondary">#FDEBEC</color>
+</resources>

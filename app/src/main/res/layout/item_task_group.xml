@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/todolist_bg_accordion"
+    android:padding="12dp"
+    android:layout_marginBottom="12dp"
+    android:elevation="4dp">
+
+    <LinearLayout
+        android:id="@+id/task_group_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@android:color/transparent">
+
+        <TextView
+            android:id="@+id/task_group_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Group title"
+            android:textSize="20sp"
+            android:fontFamily="@font/playpensans_bold"
+            android:textColor="?attr/colorPrimary"
+            android:background="@android:color/transparent"/>
+
+        <ImageView
+            android:id="@+id/task_group_toggle"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/todolist_open_task_group"
+            android:background="@android:color/transparent"/>
+
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/task_recycler"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:visibility="visible"
+        android:background="@android:color/transparent"/>
+
+</LinearLayout>

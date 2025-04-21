@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="12dp"
+    android:gravity="center_vertical"
+    android:background="@android:color/transparent">
+
+    <CheckBox
+        android:id="@+id/task_checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:button="@drawable/todolist_custom_checkbox"
+        android:background="@android:color/transparent"
+        android:tint="@null"/>
+
+    <TextView
+        android:id="@+id/task_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_weight="1"
+        android:text="Task content"
+        android:textSize="16sp"
+        android:textColor="@color/color_black"
+        android:fontFamily="@font/playpensans_medium"
+        android:background="@android:color/transparent"/>
+
+    <ImageView
+        android:id="@+id/task_options"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@drawable/todolist_task_option"
+        android:background="@android:color/transparent"/>
+</LinearLayout>
