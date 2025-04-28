@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="CustomHintTextAppearance" parent="TextAppearance.Material3.BodySmall">
+        <item name="android:fontFamily">@font/playpensans_extra_bold</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="FabCircleShape">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+        </style>
+</resources>

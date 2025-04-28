@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:gravity="center"
+    android:background="@drawable/custom_dialog_background"
+    android:clipToPadding="true">
+
+    <Button
+        android:id="@+id/profile_dialog_btn_code_generate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Sinh mã kết nối"
+        android:textSize="16sp"
+        android:backgroundTint="?attr/colorPrimary"
+        android:textColor="@android:color/white"
+        android:fontFamily="@font/playpensans_medium"
+        android:padding="12dp"
+        android:layout_marginBottom="8dp"/>
+
+    <Button
+        android:id="@+id/profile_dialog_btn_code_enter"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Nhập mã kết nối"
+        android:textSize="16sp"
+        android:backgroundTint="?attr/colorPrimary"
+        android:textColor="@android:color/white"
+        android:fontFamily="@font/playpensans_medium"
+        android:padding="12dp"/>
+</LinearLayout>

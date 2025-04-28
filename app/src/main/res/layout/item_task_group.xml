@@ -6,7 +6,7 @@
     android:background="@drawable/todolist_bg_accordion"
     android:padding="12dp"
     android:layout_marginBottom="12dp"
-    android:elevation="4dp">
+    android:elevation="12dp">
 
     <LinearLayout
         android:id="@+id/task_group_header"

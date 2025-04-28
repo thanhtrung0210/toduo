@@ -1,92 +1,115 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".mainfragment.MainTodolistFragment"
-    android:weightSum="10"
-    android:orientation="vertical">
+    tools:context=".mainfragment.MainTodolistFragment">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:text="TODUO"
-        android:textSize="32sp"
-        android:fontFamily="@font/playpensans_extra_bold"
-        android:gravity="center"
-        android:textColor="?attr/colorPrimary"
-        android:layout_weight="1"/>
-
-    <!-- Tab -->
+    <!-- Nội dung chính -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.5"
-        android:orientation="horizontal"
-        android:weightSum="4">
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:weightSum="10">
 
         <TextView
-            android:id="@+id/main_tab_time"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:text="Thời gian"
-            android:textSize="16sp"
-            android:fontFamily="@font/playpensans_bold"
-            android:background="@drawable/main_tab_bg_selected_tab"
-            android:gravity="center"
-            android:textColor="?attr/colorSecondary"
-            android:layout_weight="1"/>
-
-        <TextView
-            android:id="@+id/main_tab_category"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:text="Phân loại"
-            android:textSize="16sp"
-            android:fontFamily="@font/playpensans_bold"
-            android:background="@android:color/transparent"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:text="TODUO"
+            android:textSize="32sp"
+            android:fontFamily="@font/playpensans_extra_bold"
             android:gravity="center"
             android:textColor="?attr/colorPrimary"
             android:layout_weight="1"/>
 
-        <TextView
-            android:id="@+id/main_tab_assign"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:text="Phân công"
-            android:textSize="16sp"
-            android:fontFamily="@font/playpensans_bold"
-            android:background="@android:color/transparent"
-            android:gravity="center"
-            android:textColor="?attr/colorPrimary"
-            android:layout_weight="1"/>
+        <!-- Tab -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.5"
+            android:orientation="horizontal"
+            android:weightSum="4">
 
-        <TextView
-            android:id="@+id/main_tab_status"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:text="Trạng thái"
-            android:textSize="16sp"
-            android:fontFamily="@font/playpensans_bold"
-            android:background="@android:color/transparent"
-            android:gravity="center"
-            android:textColor="?attr/colorPrimary"
-            android:layout_weight="1"/>
+            <TextView
+                android:id="@+id/todolist_tab_time"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:text="Thời gian"
+                android:textSize="16sp"
+                android:fontFamily="@font/playpensans_bold"
+                android:background="@drawable/main_tab_bg_selected_tab"
+                android:gravity="center"
+                android:textColor="?attr/colorSecondary"
+                android:layout_weight="1"/>
+
+            <TextView
+                android:id="@+id/todolist_tab_category"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:text="Phân loại"
+                android:textSize="16sp"
+                android:fontFamily="@font/playpensans_bold"
+                android:background="@android:color/transparent"
+                android:gravity="center"
+                android:textColor="?attr/colorPrimary"
+                android:layout_weight="1"/>
+
+            <TextView
+                android:id="@+id/todolist_tab_assign"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:text="Phân công"
+                android:textSize="16sp"
+                android:fontFamily="@font/playpensans_bold"
+                android:background="@android:color/transparent"
+                android:gravity="center"
+                android:textColor="?attr/colorPrimary"
+                android:layout_weight="1"/>
+
+            <TextView
+                android:id="@+id/todolist_tab_status"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:text="Trạng thái"
+                android:textSize="16sp"
+                android:fontFamily="@font/playpensans_bold"
+                android:background="@android:color/transparent"
+                android:gravity="center"
+                android:textColor="?attr/colorPrimary"
+                android:layout_weight="1"/>
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="?attr/colorPrimary"
+            android:layout_marginTop="-1dp"/>
+
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/tab_view_pager"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="8.5"
+            android:orientation="horizontal"
+            android:overScrollMode="never" />
 
     </LinearLayout>
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:background="?attr/colorPrimary"
-        android:layout_marginTop="-1dp"/>
+    <!-- Nút Thêm Task -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/todolist_btn_add_task"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="16dp"
+        android:src="@drawable/todolist_add"
+        android:contentDescription="Thêm task"
+        android:backgroundTint="?attr/colorPrimary"
+        app:tint="?attr/colorSecondary"
+        app:fabSize="normal"
+        app:shapeAppearanceOverlay="@style/FabCircleShape"/>
 
-    <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/tab_view_pager"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="8.5"
-        android:orientation="horizontal"
-        android:overScrollMode="never" />
-
-</LinearLayout>
+</RelativeLayout>

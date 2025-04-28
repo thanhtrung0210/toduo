@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/register_activity"
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:gravity="center">
+
+    <!-- Logo TODUO -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:text="TODUO"
+        android:textColor="?attr/colorPrimary"
+        android:textSize="36sp"
+        android:fontFamily="@font/playpensans_extra_bold"
+        android:gravity="center"/>
+
+    <!-- Ô nhập Email hoặc Số điện thoại -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="20dp">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/register_txt_emailorphone_layout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:boxBackgroundMode="outline"
+            android:hint="Email hoặc số điện thoại"
+            app:boxCornerRadiusBottomStart="20dp"
+            app:boxCornerRadiusBottomEnd="20dp"
+            app:boxCornerRadiusTopEnd="20dp"
+            app:boxCornerRadiusTopStart="20dp"
+            app:endIconMode="none"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/register_txt_emailorphone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:fontFamily="@font/playpensans_medium"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="12dp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <ImageView
+            android:id="@+id/register_ic_emailorphone_warning"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/login_warning"
+            android:visibility="gone"
+            app:tint="@android:color/holo_red_dark"
+            app:layout_constraintEnd_toEndOf="@id/register_txt_emailorphone_layout"
+            app:layout_constraintTop_toTopOf="@id/register_txt_emailorphone_layout"
+            app:layout_constraintBottom_toBottomOf="@id/register_txt_emailorphone_layout"
+            android:layout_marginEnd="16dp"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Ô nhập Biệt danh -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="20dp">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/register_txt_nickname_layout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:boxBackgroundMode="outline"
+            android:hint="Biệt danh"
+            app:boxCornerRadiusBottomStart="20dp"
+            app:boxCornerRadiusBottomEnd="20dp"
+            app:boxCornerRadiusTopEnd="20dp"
+            app:boxCornerRadiusTopStart="20dp"
+            app:endIconMode="none"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/register_txt_nickname"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:fontFamily="@font/playpensans_medium"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="12dp"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <ImageView
+            android:id="@+id/register_ic_nickname_warning"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/login_warning"
+            android:visibility="gone"
+            app:tint="@android:color/holo_red_dark"
+            app:layout_constraintEnd_toEndOf="@id/register_txt_nickname_layout"
+            app:layout_constraintTop_toTopOf="@id/register_txt_nickname_layout"
+            app:layout_constraintBottom_toBottomOf="@id/register_txt_nickname_layout"
+            android:layout_marginEnd="16dp"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Ô nhập Ngày sinh -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="20dp">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/register_txt_birthdate_layout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:boxBackgroundMode="outline"
+            android:hint="Ngày sinh"
+            app:boxCornerRadiusBottomStart="20dp"
+            app:boxCornerRadiusBottomEnd="20dp"
+            app:boxCornerRadiusTopEnd="20dp"
+            app:boxCornerRadiusTopStart="20dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/register_txt_birthdate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/playpensans_medium"
+                android:inputType="none"
+                android:focusable="false"
+                android:focusableInTouchMode="false"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="12dp"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <ImageView
+            android:id="@+id/register_ic_birthdate_picker"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/login_calendar"
+            android:contentDescription="Chọn ngày sinh"
+            app:tint="@color/color_black"
+            app:layout_constraintEnd_toEndOf="@id/register_txt_birthdate_layout"
+            app:layout_constraintTop_toTopOf="@id/register_txt_birthdate_layout"
+            app:layout_constraintBottom_toBottomOf="@id/register_txt_birthdate_layout"
+            android:layout_marginEnd="16dp"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Ô nhập Mật khẩu -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="20dp">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/register_txt_password_layout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:boxBackgroundMode="outline"
+            android:hint="Mật khẩu"
+            app:boxCornerRadiusBottomStart="20dp"
+            app:boxCornerRadiusBottomEnd="20dp"
+            app:boxCornerRadiusTopEnd="20dp"
+            app:boxCornerRadiusTopStart="20dp"
+            app:endIconMode="none"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/register_txt_password"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword"
+                android:fontFamily="@font/playpensans_medium"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="12dp"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <ImageView
+            android:id="@+id/register_ic_password_toggle"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/login_password_show"
+            android:visibility="gone"
+            app:tint="@color/color_black"
+            app:layout_constraintEnd_toStartOf="@id/register_ic_password_warning"
+            app:layout_constraintTop_toTopOf="@id/register_txt_password_layout"
+            app:layout_constraintBottom_toBottomOf="@id/register_txt_password_layout"
+            android:layout_marginEnd="8dp"/>
+
+        <ImageView
+            android:id="@+id/register_ic_password_warning"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/login_warning"
+            android:visibility="gone"
+            app:tint="@android:color/holo_red_dark"
+            app:layout_constraintEnd_toEndOf="@id/register_txt_password_layout"
+            app:layout_constraintTop_toTopOf="@id/register_txt_password_layout"
+            app:layout_constraintBottom_toBottomOf="@id/register_txt_password_layout"
+            android:layout_marginEnd="16dp"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Dòng text hỗ trợ mật khẩu mạnh -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="8dp">
+
+        <TextView
+            android:id="@+id/register_password_condition_length"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="• Mật khẩu từ 8 ký tự trở lên"
+            android:fontFamily="@font/playpensans_medium"
+            android:textColor="@android:color/darker_gray"
+            android:textSize="12sp"/>
+
+        <TextView
+            android:id="@+id/register_password_condition_letter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="• Có chữ cái viết thường và viết hoa"
+            android:fontFamily="@font/playpensans_medium"
+            android:textColor="@android:color/darker_gray"
+            android:textSize="12sp"/>
+
+        <TextView
+            android:id="@+id/register_password_condition_number_special"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="• Có số và ký tự đặc biệt"
+            android:fontFamily="@font/playpensans_medium"
+            android:textColor="@android:color/darker_gray"
+            android:textSize="12sp"/>
+    </LinearLayout>
+
+    <!-- Nút Đăng ký -->
+    <Button
+        android:id="@+id/register_btn_register"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Đăng ký"
+        android:fontFamily="@font/playpensans_bold"
+        android:textSize="14sp"
+        android:textColor="@android:color/white"
+        android:backgroundTint="?attr/colorPrimary"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="20dp"
+        android:padding="16dp"/>
+
+    <!-- Dòng chữ chuyển qua trang đăng nhập -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center|bottom"
+        android:paddingBottom="20dp">
+
+        <TextView
+            android:id="@+id/register_login_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Đã có tài khoản? Đăng nhập ngay"
+            android:fontFamily="@font/playpensans_medium"
+            android:textColor="@android:color/black"
+            android:textSize="16sp"
+            android:clickable="true"
+            android:focusable="true"/>
+    </LinearLayout>
+
+</LinearLayout>

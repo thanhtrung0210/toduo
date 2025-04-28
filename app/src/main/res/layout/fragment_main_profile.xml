@@ -4,16 +4,185 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".mainfragment.MainTodolistFragment"
-    android:background="@android:color/holo_orange_light"
-    android:gravity="center">
+    android:padding="20dp"
+    android:background="@color/color_white"
+    android:gravity="center_horizontal"
+    android:orientation="vertical">
 
+    <!-- Phần Header: Tên cặp đôi và số ngày bên nhau -->
     <TextView
+        android:id="@+id/profile_couple_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Thông tin"
-        android:textSize="20sp"
+        android:text="User 1 ♥ User 2"
+        android:textSize="32sp"
+        android:textColor="@android:color/black"
         android:fontFamily="@font/playpensans_bold"
-        android:textColor="@color/color_white"
-        android:background="@android:color/transparent"/>
+        android:layout_marginTop="20dp"/>
+
+    <TextView
+        android:id="@+id/profile_days_together"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Đã bên nhau được 100 ngày"
+        android:textSize="16sp"
+        android:textColor="@android:color/black"
+        android:fontFamily="@font/playpensans_medium"
+        android:layout_marginTop="8dp"/>
+
+    <!-- Phần giữa: 3 khung vuông chứa icon -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginTop="20dp">
+
+        <!-- Khung 1: Ghi chú chung -->
+        <ImageView
+            android:id="@+id/profile_note"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:src="@drawable/profile_note"
+            android:background="@drawable/login_logo_background"
+            android:elevation="8dp"
+            android:layout_marginEnd="16dp"/>
+
+        <!-- Khung 2: Túi đồ chung -->
+        <ImageView
+            android:id="@+id/profile_bag"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:src="@drawable/profile_bag"
+            android:background="@drawable/login_logo_background"
+            android:elevation="8dp"
+            android:layout_marginHorizontal="16dp"/>
+
+        <!-- Khung 3: Cửa hàng -->
+        <ImageView
+            android:id="@+id/profile_store"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:src="@drawable/profile_store"
+            android:background="@drawable/login_logo_background"
+            android:elevation="8dp"
+            android:layout_marginStart="16dp"/>
+    </LinearLayout>
+
+    <!-- Phần dưới: Menu tùy chọn -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="40dp"
+        android:layout_marginHorizontal="20dp">
+
+        <!-- Tùy chọn: Xem thông tin cặp đôi (ẩn nếu chưa ghép nối) -->
+        <LinearLayout
+            android:id="@+id/profile_option_couple_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Xem thông tin cặp đôi"
+                android:textSize="16sp"
+                android:textColor="@android:color/black"
+                android:fontFamily="@font/playpensans_medium"
+                android:paddingVertical="12dp"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@android:color/darker_gray"/>
+        </LinearLayout>
+
+        <!-- Tùy chọn: Ghép đôi (hiển thị nếu chưa ghép nối) -->
+        <LinearLayout
+            android:id="@+id/profile_option_pair"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Ghép đôi"
+                android:textSize="16sp"
+                android:textColor="@android:color/black"
+                android:fontFamily="@font/playpensans_medium"
+                android:paddingVertical="12dp"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@android:color/darker_gray"/>
+        </LinearLayout>
+
+        <!-- Tùy chọn: Xem thông tin cá nhân -->
+        <LinearLayout
+            android:id="@+id/profile_option_personal_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Xem thông tin cá nhân"
+                android:textSize="16sp"
+                android:textColor="@android:color/black"
+                android:fontFamily="@font/playpensans_medium"
+                android:paddingVertical="12dp"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@android:color/darker_gray"/>
+        </LinearLayout>
+
+        <!-- Tùy chọn: Cài đặt -->
+        <LinearLayout
+            android:id="@+id/profile_option_settings"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Cài đặt"
+                android:textSize="16sp"
+                android:textColor="@android:color/black"
+                android:fontFamily="@font/playpensans_medium"
+                android:paddingVertical="12dp"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@android:color/darker_gray"/>
+        </LinearLayout>
+
+        <!-- Tùy chọn: Đăng xuất (màu secondary) -->
+        <LinearLayout
+            android:id="@+id/profile_option_logout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Đăng xuất"
+                android:textSize="16sp"
+                android:textColor="@color/color_red"
+                android:fontFamily="@font/playpensans_medium"
+                android:paddingVertical="12dp"/>
+        </LinearLayout>
+    </LinearLayout>
 
 </LinearLayout>

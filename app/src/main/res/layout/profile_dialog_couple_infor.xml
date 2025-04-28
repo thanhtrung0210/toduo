@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@drawable/custom_dialog_background"
+    android:clipToPadding="true">
+
+    <TextView
+        android:id="@+id/profile_dialog_infor_couple_user_infor"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Biệt danh: Bé Mèo\nNgày sinh: 20-05-1995"
+        android:textSize="16sp"
+        android:textColor="@android:color/black"
+        android:fontFamily="@font/playpensans_medium"
+        android:layout_marginBottom="16dp"/>
+
+    <TextView
+        android:id="@+id/profile_dialog_infor_couple_partner_infor"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Biệt danh: Bé Cún\nNgày sinh: 15-08-1996"
+        android:textSize="16sp"
+        android:textColor="@android:color/black"
+        android:fontFamily="@font/playpensans_medium"
+        android:layout_marginBottom="16dp"/>
+
+    <TextView
+        android:id="@+id/profile_dialog_infor_anniversary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Ngày kỷ niệm: 01-01-2024"
+        android:textSize="16sp"
+        android:textColor="@android:color/black"
+        android:fontFamily="@font/playpensans_medium"
+        android:layout_marginBottom="16dp"/>
+
+    <!-- Nút Đóng -->
+    <Button
+        android:id="@+id/profile_dialog_couple_info_btn_close"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Đóng"
+        android:textSize="16sp"
+        android:backgroundTint="?attr/colorSecondary"
+        android:textColor="@android:color/white"
+        android:fontFamily="@font/playpensans_medium"
+        android:padding="12dp"/>
+
+</LinearLayout>

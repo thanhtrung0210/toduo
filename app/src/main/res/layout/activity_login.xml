@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/login_activity"
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:gravity="center">
+
+    <!-- Logo TODUO -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"
+        android:text="TODUO"
+        android:textColor="?attr/colorPrimary"
+        android:textSize="36sp"
+        android:fontFamily="@font/playpensans_extra_bold"
+        android:gravity="center"/>
+
+    <!-- Ô nhập Email hoặc Số điện thoại -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="20dp">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/login_txt_emailorphone_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:boxBackgroundMode="outline"
+            android:hint="Email hoặc số điện thoại"
+            app:boxCornerRadiusBottomStart="20dp"
+            app:boxCornerRadiusBottomEnd="20dp"
+            app:boxCornerRadiusTopEnd="20dp"
+            app:boxCornerRadiusTopStart="20dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/login_txt_emailorphone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:fontFamily="@font/playpensans_medium"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="12dp"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <ImageView
+            android:id="@+id/icEmailOrPhoneWarning"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/login_warning"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="@id/login_txt_emailorphone_layout"
+            app:layout_constraintTop_toTopOf="@id/login_txt_emailorphone_layout"
+            app:layout_constraintBottom_toBottomOf="@id/login_txt_emailorphone_layout"
+            android:layout_marginEnd="16dp"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Ô nhập Mật khẩu -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="20dp">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/register_txt_password_layout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:boxBackgroundMode="outline"
+            android:hint="Mật khẩu"
+            app:boxCornerRadiusBottomStart="20dp"
+            app:boxCornerRadiusBottomEnd="20dp"
+            app:boxCornerRadiusTopEnd="20dp"
+            app:boxCornerRadiusTopStart="20dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/register_txt_password"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword"
+                android:fontFamily="@font/playpensans_medium"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="12dp"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <ImageView
+            android:id="@+id/register_ic_password_toggle"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/login_password_show"
+            android:visibility="gone"
+            app:tint="@color/color_black"
+            app:layout_constraintEnd_toEndOf="@id/register_txt_password_layout"
+            app:layout_constraintTop_toTopOf="@id/register_txt_password_layout"
+            app:layout_constraintBottom_toBottomOf="@id/register_txt_password_layout"
+            android:layout_marginEnd="16dp"/>
+
+        <ImageView
+            android:id="@+id/icPasswordWarning"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/login_warning"
+            android:visibility="gone"
+            app:layout_constraintEnd_toStartOf="@id/register_ic_password_toggle"
+            app:layout_constraintTop_toTopOf="@id/register_txt_password_layout"
+            app:layout_constraintBottom_toBottomOf="@id/register_txt_password_layout"
+            android:layout_marginEnd="8dp"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Chữ Quên mật khẩu -->
+    <TextView
+        android:id="@+id/login_btn_forgot_password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Quên mật khẩu?"
+        android:fontFamily="@font/playpensans_medium"
+        android:textColor="?attr/colorPrimary"
+        android:textSize="12sp"
+        android:gravity="end"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="8dp"/>
+
+    <!-- Nút Đăng nhập -->
+    <Button
+        android:id="@+id/login_btn_login"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Đăng nhập"
+        android:textSize="14sp"
+        android:textColor="@color/color_white"
+        android:fontFamily="@font/playpensans_bold"
+        android:backgroundTint="?attr/colorPrimary"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="20dp"
+        android:padding="16dp"/>
+
+    <!-- Dòng ngăn cách OR -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginTop="20dp"
+        android:layout_marginHorizontal="20dp">
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1"
+            android:background="@android:color/darker_gray"
+            android:layout_marginEnd="10dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="HOẶC"
+            android:textColor="@android:color/darker_gray"
+            android:fontFamily="@font/playpensans_bold"
+            android:textSize="14sp"/>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1"
+            android:background="@android:color/darker_gray"
+            android:layout_marginStart="10dp"/>
+    </LinearLayout>
+
+    <!-- Container cho 2 logo đăng nhập nhanh -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginTop="20dp">
+
+        <!-- Logo Google -->
+        <ImageView
+            android:id="@+id/login_btn_google"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:src="@drawable/login_logo_google"
+            android:background="@drawable/login_logo_background"
+            android:elevation="8dp"
+            android:layout_marginEnd="16dp" />
+
+        <!-- Logo Facebook -->
+        <ImageView
+            android:id="@+id/login_btn_facebook"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:src="@drawable/login_logo_facebook"
+            android:background="@drawable/login_logo_background"
+            android:elevation="8dp"
+            android:layout_marginStart="16dp"/>
+    </LinearLayout>
+
+    <!-- Dòng chữ chuyển qua trang đăng ký -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center|bottom"
+        android:paddingBottom="20dp">
+
+        <TextView
+            android:id="@+id/login_register_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="true"
+            android:fontFamily="@font/playpensans_medium"
+            android:text="Chưa có tài khoản? Đăng ký ngay"
+            android:textColor="@android:color/black"
+            android:textSize="16sp" />
+    </LinearLayout>
+
+</LinearLayout>

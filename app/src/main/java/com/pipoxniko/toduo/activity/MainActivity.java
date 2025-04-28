@@ -1,4 +1,4 @@
-package com.pipoxniko.toduo;
+package com.pipoxniko.toduo.activity;
 
 import android.graphics.Color;
 import android.os.Bundle;
@@ -14,6 +14,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.viewpager2.widget.ViewPager2;
 
+import com.pipoxniko.toduo.R;
 import com.pipoxniko.toduo.adapter.MainViewPagerAdapter;
 
 public class MainActivity extends AppCompatActivity {

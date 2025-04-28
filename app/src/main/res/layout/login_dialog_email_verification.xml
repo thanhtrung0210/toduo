@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:layout_marginHorizontal="32dp"
+    android:paddingVertical="16dp"
+    android:layout_gravity="center"
+    android:background="@drawable/custom_dialog_background"
+    android:clipToPadding="true">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Xác thực Email"
+        android:fontFamily="@font/playpensans_bold"
+        android:textColor="?attr/colorPrimary"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:paddingBottom="8dp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Vui lòng kiểm tra email của bạn và nhấn vào đường link để hoàn tất đăng ký."
+        android:fontFamily="@font/playpensans_medium"
+        android:textSize="14sp"
+        android:gravity="center"
+        android:paddingBottom="16dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:paddingBottom="16dp">
+
+        <Button
+            android:id="@+id/dialog_verifi_email_btn_confirm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Đã xác nhận"
+            android:textSize="14sp"
+            android:fontFamily="@font/playpensans_medium"
+            android:backgroundTint="@color/color_dark_gray"
+            android:textColor="@android:color/white"
+            android:paddingHorizontal="16dp"
+            android:layout_marginEnd="16dp"/>
+
+        <Button
+            android:id="@+id/dialog_verifi_email_btn_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Hủy"
+            android:textSize="14sp"
+            android:fontFamily="@font/playpensans_medium"
+            android:backgroundTint="?attr/colorSecondary"
+            android:textColor="@android:color/white"
+            android:paddingHorizontal="16dp"/>
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/dialog_verifi_email_resend_txt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:text="Không nhận được email? Gửi lại sau 30s"
+        android:textSize="12sp"
+        android:fontFamily="@font/playpensans_medium"
+        android:textColor="@android:color/black"
+        android:visibility="visible"
+        android:clickable="false"
+        android:focusable="false"/>
+
+</LinearLayout>

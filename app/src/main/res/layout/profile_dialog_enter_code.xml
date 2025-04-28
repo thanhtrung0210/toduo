@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:gravity="center"
+    android:background="@drawable/custom_dialog_background"
+    android:clipToPadding="true">
+
+    <TextView
+        android:id="@+id/dialog_code_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Hãy nhập mã kết nối"
+        android:textSize="16sp"
+        android:textColor="@android:color/black"
+        android:fontFamily="@font/playpensans_medium"
+        android:layout_marginBottom="16dp"
+        android:gravity="center"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center">
+
+        <EditText
+            android:id="@+id/dialog_code_digit_1"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:maxLength="1"
+            android:inputType="number"
+            android:textColor="@color/color_black"
+            android:fontFamily="@font/playpensans_medium"
+            android:background="@drawable/otp_box_background"
+            android:gravity="center"
+            android:textSize="20sp"
+            android:layout_margin="4dp"/>
+
+        <EditText
+            android:id="@+id/dialog_code_digit_2"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:maxLength="1"
+            android:inputType="number"
+            android:textColor="@color/color_black"
+            android:fontFamily="@font/playpensans_medium"
+            android:background="@drawable/otp_box_background"
+            android:gravity="center"
+            android:textSize="20sp"
+            android:layout_margin="4dp"/>
+
+        <EditText
+            android:id="@+id/dialog_code_digit_3"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:maxLength="1"
+            android:inputType="number"
+            android:textColor="@color/color_black"
+            android:fontFamily="@font/playpensans_medium"
+            android:background="@drawable/otp_box_background"
+            android:gravity="center"
+            android:textSize="20sp"
+            android:layout_margin="4dp"/>
+
+        <EditText
+            android:id="@+id/dialog_code_digit_4"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:maxLength="1"
+            android:inputType="number"
+            android:textColor="@color/color_black"
+            android:fontFamily="@font/playpensans_medium"
+            android:background="@drawable/otp_box_background"
+            android:gravity="center"
+            android:textSize="20sp"
+            android:layout_margin="4dp"/>
+
+        <EditText
+            android:id="@+id/dialog_code_digit_5"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:maxLength="1"
+            android:inputType="number"
+            android:textColor="@color/color_black"
+            android:fontFamily="@font/playpensans_medium"
+            android:background="@drawable/otp_box_background"
+            android:gravity="center"
+            android:textSize="20sp"
+            android:layout_margin="4dp"/>
+
+        <EditText
+            android:id="@+id/dialog_code_digit_6"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:maxLength="1"
+            android:inputType="number"
+            android:textColor="@color/color_black"
+            android:fontFamily="@font/playpensans_medium"
+            android:background="@drawable/otp_box_background"
+            android:gravity="center"
+            android:textSize="20sp"
+            android:layout_margin="4dp"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="16dp">
+
+        <Button
+            android:id="@+id/dialog_submit_code_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Xác nhận"
+            android:textSize="16sp"
+            android:backgroundTint="?attr/colorPrimary"
+            android:textColor="@android:color/white"
+            android:fontFamily="@font/playpensans_medium"
+            android:padding="12dp"
+            android:layout_marginEnd="4dp"/>
+
+        <Button
+            android:id="@+id/profile_dialog_btn_close"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Đóng"
+            android:textSize="16sp"
+            android:backgroundTint="?attr/colorSecondary"
+            android:textColor="@android:color/white"
+            android:fontFamily="@font/playpensans_medium"
+            android:padding="12dp"
+            android:layout_marginStart="4dp"/>
+    </LinearLayout>
+</LinearLayout>

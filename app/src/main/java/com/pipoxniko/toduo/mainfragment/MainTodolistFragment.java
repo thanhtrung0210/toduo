@@ -32,10 +32,10 @@ public class MainTodolistFragment extends Fragment {
         //Ánh xạ view
         viewPager2 = mView.findViewById(R.id.tab_view_pager);
 
-        tabTime = mView.findViewById(R.id.main_tab_time);
-        tabCategory = mView.findViewById(R.id.main_tab_category);
-        tabAssign = mView.findViewById(R.id.main_tab_assign);
-        tabStatus = mView.findViewById(R.id.main_tab_status);
+        tabTime = mView.findViewById(R.id.todolist_tab_time);
+        tabCategory = mView.findViewById(R.id.todolist_tab_category);
+        tabAssign = mView.findViewById(R.id.todolist_tab_assign);
+        tabStatus = mView.findViewById(R.id.todolist_tab_status);
 
         //Mặc định sẽ là tab Thời gian
         setTabSelected("time");

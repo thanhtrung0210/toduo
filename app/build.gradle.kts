@@ -1,8 +1,19 @@
 plugins {
     alias(libs.plugins.android.application)
+
+//    id("com.android.application")
+    id("com.google.gms.google-services")
 }
 
 android {
+    signingConfigs {
+        create("my_config") {
+            storeFile = file("E:\\Shy\\toduo\\keystore\\toduo_keystore.jks")
+            storePassword = "1)Trung."
+            keyAlias = "pipo"
+            keyPassword = "1)Trung."
+        }
+    }
     namespace = "com.pipoxniko.toduo"
     compileSdk = 35
 
@@ -23,6 +34,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("my_config")
         }
     }
     compileOptions {
@@ -41,4 +53,8 @@ dependencies {
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
 
+    implementation(platform("com.google.firebase:firebase-bom:33.12.0"))
+    implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-database")
 }
