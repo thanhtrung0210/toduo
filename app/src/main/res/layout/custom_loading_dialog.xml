@@ -4,9 +4,7 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:padding="16dp"
-    android:gravity="center"
-    android:background="@drawable/custom_dialog_background"
-    android:clipToPadding="true">
+    android:gravity="center">
 
     <ProgressBar
         android:layout_width="wrap_content"

@@ -278,7 +278,7 @@ public class LoginActivity extends AppCompatActivity {
                             String errorMessage = task.getException().getMessage();
                             if (errorMessage != null) {
                                 if (errorMessage.contains("The password is invalid") ||
-                                        errorMessage.contains("There is no user record")) {
+                                        errorMessage.contains("There is no user record") || errorMessage.contains("The supplied auth credential is incorrect, malformed or has expired")) {
                                     Toast.makeText(LoginActivity.this,
                                             "Email hoặc mật khẩu không chính xác. Vui lòng thử lại.",
                                             Toast.LENGTH_LONG).show();

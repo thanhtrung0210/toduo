@@ -4,9 +4,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="16dp"
-    android:gravity="center"
-    android:background="@drawable/custom_dialog_background"
-    android:clipToPadding="true">
+    android:gravity="center">
 
     <TextView
         android:id="@+id/profile_dialog_title_code_generated"

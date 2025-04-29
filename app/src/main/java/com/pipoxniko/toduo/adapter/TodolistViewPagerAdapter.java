@@ -5,7 +5,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
-import com.pipoxniko.toduo.todolistfragment.TodolistAssignFragment;
+import com.pipoxniko.toduo.todolistfragment.TodolistAssignmentFragment;
 import com.pipoxniko.toduo.todolistfragment.TodolistCategoryFragment;
 import com.pipoxniko.toduo.todolistfragment.TodolistStatusFragment;
 import com.pipoxniko.toduo.todolistfragment.TodolistTimeFragment;
@@ -21,7 +21,7 @@ public class TodolistViewPagerAdapter extends FragmentStateAdapter {
         switch (position) {
             case 0:  return new TodolistTimeFragment();
             case 1:  return new TodolistCategoryFragment();
-            case 2:  return new TodolistAssignFragment();
+            case 2:  return new TodolistAssignmentFragment();
             case 3:  return new TodolistStatusFragment();
             default: return new TodolistTimeFragment();
         }

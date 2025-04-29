@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@android:color/white">
+
+    <!-- Tiêu đề -->
+    <EditText
+        android:id="@+id/todolist_add_task_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Tiêu đề mục tiêu"
+        android:fontFamily="@font/playpensans_medium"
+        android:padding="8dp"
+        android:layout_marginBottom="8dp"
+        android:background="@android:drawable/edit_text" />
+
+    <!-- Mô tả -->
+    <EditText
+        android:id="@+id/todolist_add_task_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Mô tả mục tiêu"
+        android:fontFamily="@font/playpensans_medium"
+        android:padding="8dp"
+        android:layout_marginBottom="8dp"
+        android:background="@android:drawable/edit_text"
+        android:lines="3"
+        android:gravity="top" />
+
+    <!-- Dòng chứa các icon -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="16dp">
+
+        <!-- Icon lịch (chưa xử lý sự kiện) -->
+        <ImageView
+            android:id="@+id/todolist_add_task_deadline"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@drawable/login_calendar"
+            android:layout_marginEnd="16dp"
+            android:tint="?attr/colorPrimary"
+            tools:ignore="UseAppTint" />
+
+        <!-- Icon tag (phân loại) -->
+        <ImageView
+            android:id="@+id/todolist_add_task_category"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@drawable/todolist_add_task_category"
+            android:tint="?attr/colorPrimary"
+            tools:ignore="UseAppTint"
+            android:layout_marginEnd="16dp" />
+
+        <!-- Icon phân công -->
+        <ImageView
+            android:id="@+id/todolist_add_task_assignment"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@drawable/todolist_add_task_assignment"
+            android:tint="?attr/colorPrimary"
+            tools:ignore="UseAppTint"
+            android:layout_marginEnd="16dp" />
+
+        <!-- Icon task con (chưa xử lý sự kiện) -->
+        <ImageView
+            android:id="@+id/todolist_add_task_subtask"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@drawable/todolist_add_task_subtask"
+            android:tint="?attr/colorPrimary"
+            tools:ignore="UseAppTint"
+            android:layout_marginEnd="16dp" />
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="5"/>
+
+        <!-- Nút "Tải lên" dạng FloatingActionButton -->
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/todolist_add_task_save"
+            android:layout_width="0dp"
+            android:layout_weight="3"
+            android:layout_height="wrap_content"
+            android:src="@drawable/todolist_add_task_save"
+            android:contentDescription="Lưu task"
+            android:backgroundTint="?attr/colorPrimary"
+            app:tint="?attr/colorSecondary"
+            app:fabCustomSize="36dp"
+            app:maxImageSize="24dp"
+            app:shapeAppearanceOverlay="@style/FabCircleShape" />
+    </LinearLayout>
+
+</LinearLayout>

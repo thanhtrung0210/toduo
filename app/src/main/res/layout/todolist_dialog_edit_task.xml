@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@android:color/white">
+
+    <!-- Phần 1: Hiển thị chi tiết hiện tại -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Thông tin hiện tại"
+        android:fontFamily="@font/playpensans_bold"
+        android:textSize="20sp"
+        android:layout_marginBottom="8dp"/>
+
+    <TextView
+        android:id="@+id/task_edit_txt_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Mục tiêu: "
+        android:fontFamily="@font/playpensans_medium"
+        android:textSize="16sp"
+        android:layout_marginBottom="8dp"/>
+
+    <TextView
+        android:id="@+id/task_edit_txt_description"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Mô tả: "
+        android:fontFamily="@font/playpensans_medium"
+        android:textSize="16sp"
+        android:layout_marginBottom="8dp"/>
+
+    <TextView
+        android:id="@+id/task_edit_txt_deadline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Hạn chót: "
+        android:fontFamily="@font/playpensans_medium"
+        android:textSize="16sp"
+        android:layout_marginBottom="8dp"/>
+
+    <TextView
+        android:id="@+id/task_edit_txt_category"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Phân loại: "
+        android:fontFamily="@font/playpensans_medium"
+        android:textSize="16sp"
+        android:layout_marginBottom="8dp"/>
+
+    <TextView
+        android:id="@+id/task_edit_txt_assignment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Phân công: "
+        android:fontFamily="@font/playpensans_medium"
+        android:textSize="16sp"
+        android:layout_marginBottom="16dp"/>
+
+    <!-- Phần 2: Chỉnh sửa -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Chỉnh sửa công việc"
+        android:fontFamily="@font/playpensans_bold"
+        android:textSize="20sp"
+        android:layout_marginBottom="8dp"/>
+
+    <EditText
+        android:id="@+id/task_edit_edit_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Tiêu đề"
+        android:fontFamily="@font/playpensans_medium"
+        android:inputType="text"
+        android:textSize="16sp"
+        android:layout_marginBottom="8dp"/>
+
+    <EditText
+        android:id="@+id/task_edit_edit_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Mô tả"
+        android:fontFamily="@font/playpensans_medium"
+        android:inputType="textMultiLine"
+        android:lines="3"
+        android:gravity="top"
+        android:layout_marginBottom="16dp"/>
+
+    <!-- Dòng chứa các icon -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="16dp">
+
+        <!-- Icon lịch (chưa xử lý sự kiện) -->
+        <ImageView
+            android:id="@+id/task_edit_edit_deadline"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@drawable/login_calendar"
+            android:layout_marginEnd="16dp"
+            android:tint="?attr/colorPrimary"
+            tools:ignore="UseAppTint" />
+
+        <!-- Icon tag (phân loại) -->
+        <ImageView
+            android:id="@+id/task_edit_edit_category"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@drawable/todolist_add_task_category"
+            android:tint="?attr/colorPrimary"
+            tools:ignore="UseAppTint"
+            android:layout_marginEnd="16dp" />
+
+        <!-- Icon phân công -->
+        <ImageView
+            android:id="@+id/task_edit_edit_assignment"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@drawable/todolist_add_task_assignment"
+            android:tint="?attr/colorPrimary"
+            tools:ignore="UseAppTint"
+            android:layout_marginEnd="16dp" />
+
+        <!-- Icon task con (chưa xử lý sự kiện) -->
+        <ImageView
+            android:id="@+id/task_edit_edit_subtask"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@drawable/todolist_add_task_subtask"
+            android:tint="?attr/colorPrimary"
+            tools:ignore="UseAppTint"
+            android:layout_marginEnd="16dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end">
+
+        <Button
+            android:id="@+id/task_edit_btn_save"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Lưu"
+            android:fontFamily="@font/playpensans_medium"
+            android:layout_marginEnd="8dp"/>
+
+        <Button
+            android:id="@+id/task_edit_btn_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Hủy"
+            android:fontFamily="@font/playpensans_medium"
+            android:backgroundTint="?attr/colorSecondary"/>
+    </LinearLayout>
+</LinearLayout>

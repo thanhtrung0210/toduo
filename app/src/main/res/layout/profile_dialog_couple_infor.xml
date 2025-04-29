@@ -3,9 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="16dp"
-    android:background="@drawable/custom_dialog_background"
-    android:clipToPadding="true">
+    android:padding="16dp">
 
     <TextView
         android:id="@+id/profile_dialog_infor_couple_user_infor"
