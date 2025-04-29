@@ -8,8 +8,11 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.drawable.ColorDrawable;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -165,6 +168,9 @@ public class ItemTaskAdapter extends RecyclerView.Adapter<ItemTaskAdapter.TaskVi
                 .setView(dialogView)
                 .create();
 
+        // Thêm logic ẩn bàn phím khi chạm ngoài
+        setupHideKeyboard(dialogView);
+
         TextView tvTitle = dialogView.findViewById(R.id.task_detail_txt_title);
         TextView tvDescription = dialogView.findViewById(R.id.task_detail_txt_description);
         TextView tvDeadline = dialogView.findViewById(R.id.task_detail_txt_deadline);
@@ -222,6 +228,9 @@ public class ItemTaskAdapter extends RecyclerView.Adapter<ItemTaskAdapter.TaskVi
         AlertDialog dialog = new AlertDialog.Builder(context)
                 .setView(dialogView)
                 .create();
+
+        // Thêm logic ẩn bàn phím khi chạm ngoài
+        setupHideKeyboard(dialogView);
 
         // Phần 1: Hiển thị thông tin hiện tại
         TextView tvTitle = dialogView.findViewById(R.id.task_edit_txt_title);
@@ -289,6 +298,10 @@ public class ItemTaskAdapter extends RecyclerView.Adapter<ItemTaskAdapter.TaskVi
         editTitle.setText(task.getTitle());
         editDescription.setText(task.getDescription());
         selectedAssignment = task.getAssignment();
+
+        // Thêm logic ẩn bàn phím khi nhấn "Enter"
+        setupEditTextHideKeyboardOnEnter(editTitle);
+        setupEditTextHideKeyboardOnEnter(editDescription);
 
         editCategoryIcon.setOnClickListener(v -> showCategoryDialog(dialogView, editCategoryIcon));
         editAssignmentIcon.setOnClickListener(v -> showAssignmentDialog(dialogView, editAssignmentIcon));
@@ -434,7 +447,7 @@ public class ItemTaskAdapter extends RecyclerView.Adapter<ItemTaskAdapter.TaskVi
                 String user2Name = "User 2";
 
                 if (snapshot.child(currentUserId).exists()) {
-                    user1Name = snapshot.child(currentUserId).child("nickName").getValue(String.class);
+                    user1Name = snapshot.child(currentUserId).child("nickname").getValue(String.class);
                     if (user1Name == null || user1Name.isEmpty()) user1Name = "User 1";
                 }
 
@@ -443,7 +456,7 @@ public class ItemTaskAdapter extends RecyclerView.Adapter<ItemTaskAdapter.TaskVi
                         String userId = userSnapshot.getKey();
                         String userCoupleId = userSnapshot.child("coupleId").getValue(String.class);
                         if (userId != null && !userId.equals(currentUserId) && coupleId.equals(userCoupleId)) {
-                            user2Name = userSnapshot.child("nickName").getValue(String.class);
+                            user2Name = userSnapshot.child("nickname").getValue(String.class);
                             if (user2Name == null || user2Name.isEmpty()) user2Name = "User 2";
                             break;
                         }
@@ -486,6 +499,9 @@ public class ItemTaskAdapter extends RecyclerView.Adapter<ItemTaskAdapter.TaskVi
                 .setView(deadlineView)
                 .create();
 
+        // Thêm logic ẩn bàn phím khi chạm ngoài
+        setupHideKeyboard(deadlineView);
+
         Switch switchSelectDate = deadlineView.findViewById(R.id.todolist_set_deadline_switch_select_date);
         LinearLayout datePickerContainer = deadlineView.findViewById(R.id.todolist_set_deadline_date_picker_container);
         Button btnSelectDate = deadlineView.findViewById(R.id.todolist_set_deadline_btn_select_date);
@@ -494,7 +510,7 @@ public class ItemTaskAdapter extends RecyclerView.Adapter<ItemTaskAdapter.TaskVi
         Switch switchSelectTime = deadlineView.findViewById(R.id.todolist_set_deadline_switch_select_time);
         LinearLayout timePickerContainer = deadlineView.findViewById(R.id.todolist_set_deadline_time_picker_container);
         Button btnSelectTime = deadlineView.findViewById(R.id.todolist_set_deadline_btn_select_time);
-        TextView tvSelectedTime = deadlineView.findViewById(R.id.todolist_set_deadline_btn_select_time);
+        TextView tvSelectedTime = deadlineView.findViewById(R.id.todolist_set_deadline_tv_selected_time);
 
         Button btnCancel = deadlineView.findViewById(R.id.todolist_set_deadline_btn_cancel);
         Button btnConfirm = deadlineView.findViewById(R.id.todolist_set_deadline_btn_confirm);
@@ -570,6 +586,9 @@ public class ItemTaskAdapter extends RecyclerView.Adapter<ItemTaskAdapter.TaskVi
                 .setView(dialogView)
                 .create();
 
+        // Thêm logic ẩn bàn phím khi chạm ngoài
+        setupHideKeyboard(dialogView);
+
         Button btnNo = dialogView.findViewById(R.id.task_delete_btn_no);
         Button btnYes = dialogView.findViewById(R.id.task_delete_btn_yes);
 
@@ -594,6 +613,47 @@ public class ItemTaskAdapter extends RecyclerView.Adapter<ItemTaskAdapter.TaskVi
 
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialog.show();
+    }
+
+    // Phương thức để ẩn bàn phím khi chạm ngoài EditText
+    private void setupHideKeyboard(View view) {
+        if (!(view instanceof EditText)) {
+            view.setOnTouchListener((v, event) -> {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    hideKeyboard(v);
+                }
+                return false;
+            });
+        }
+
+        if (view instanceof ViewGroup) {
+            for (int i = 0; i < ((ViewGroup) view).getChildCount(); i++) {
+                View innerView = ((ViewGroup) view).getChildAt(i);
+                setupHideKeyboard(innerView);
+            }
+        }
+    }
+
+    // Phương thức để ẩn bàn phím khi nhấn "Enter"
+    private void setupEditTextHideKeyboardOnEnter(EditText editText) {
+        editText.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_GO ||
+                    actionId == EditorInfo.IME_ACTION_SEND || actionId == EditorInfo.IME_ACTION_SEARCH ||
+                    (event != null && event.getAction() == android.view.KeyEvent.ACTION_DOWN &&
+                            event.getKeyCode() == android.view.KeyEvent.KEYCODE_ENTER)) {
+                hideKeyboard(editText);
+                return true;
+            }
+            return false;
+        });
+    }
+
+    // Phương thức ẩn bàn phím
+    private void hideKeyboard(View view) {
+        InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm != null) {
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
     }
 
     public static class TaskViewHolder extends RecyclerView.ViewHolder {

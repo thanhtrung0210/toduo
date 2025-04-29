@@ -1,5 +1,8 @@
 package com.pipoxniko.toduo.todolistfragment;
 
+import android.app.AlertDialog;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -38,6 +41,7 @@ public class TodolistCategoryFragment extends Fragment {
     private ItemTaskGroupAdapter groupAdapter;
     private DatabaseReference databaseReference;
     private String coupleId;
+    private AlertDialog loadingDialog; // Thêm dialog loading
 
     @Nullable
     @Override
@@ -61,11 +65,22 @@ public class TodolistCategoryFragment extends Fragment {
 
         if (getContext() != null) {
             recyclerGroup.setLayoutManager(new LinearLayoutManager(getContext()));
+            recyclerGroup.setNestedScrollingEnabled(false); // Tắt cuộn của RecyclerView để NestedScrollView xử lý
         }
 
         // Khởi tạo adapter
         groupAdapter = new ItemTaskGroupAdapter(groupList, getContext());
         recyclerGroup.setAdapter(groupAdapter);
+
+        // Khởi tạo dialog loading
+        if (getActivity() != null) {
+            View loadingView = inflater.inflate(R.layout.custom_loading_dialog, null);
+            loadingDialog = new AlertDialog.Builder(getActivity())
+                    .setView(loadingView)
+                    .setCancelable(false)
+                    .create();
+            loadingDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        }
 
         // Khởi tạo Firebase
         databaseReference = FirebaseDatabase.getInstance().getReference("TODUO");
@@ -108,6 +123,16 @@ public class TodolistCategoryFragment extends Fragment {
         return mView;
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        // Đóng dialog loading nếu đang hiển thị
+        if (loadingDialog != null && loadingDialog.isShowing()) {
+            loadingDialog.dismiss();
+        }
+        loadingDialog = null;
+    }
+
     private void showEmptyMessage() {
         groupList.clear();
         groupAdapter.notifyDataSetChanged();
@@ -116,6 +141,11 @@ public class TodolistCategoryFragment extends Fragment {
     }
 
     private void loadCategoriesAndTasks() {
+        // Hiển thị dialog loading
+        if (loadingDialog != null) {
+            loadingDialog.show();
+        }
+
         // Bước 1: Lấy danh sách các phân loại từ task_categories
         databaseReference.child("task_categories").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -126,34 +156,64 @@ public class TodolistCategoryFragment extends Fragment {
                     String categoryCoupleId = categorySnapshot.child("couple_id").getValue(String.class);
                     String categoryName = categorySnapshot.child("name").getValue(String.class);
 
-                    if (categoryCoupleId != null && categoryCoupleId.equals(coupleId) && categoryName != null) {
+                    if (categoryId != null && categoryCoupleId != null && categoryCoupleId.equals(coupleId) && categoryName != null) {
                         categoryMap.put(categoryId, categoryName);
                         Log.d("TodolistCategoryFragment", "Category found: " + categoryName + " (ID: " + categoryId + ")");
+                    } else {
+                        Log.d("TodolistCategoryFragment", "Bỏ qua category với ID: " + categoryId + " do không khớp coupleId hoặc dữ liệu không đầy đủ");
                     }
                 }
 
                 if (categoryMap.isEmpty()) {
                     Log.d("TodolistCategoryFragment", "Không tìm thấy phân loại nào cho coupleId: " + coupleId);
+                    if (loadingDialog != null && loadingDialog.isShowing()) {
+                        loadingDialog.dismiss();
+                    }
                     showEmptyMessage();
                     return;
                 }
 
                 // Bước 2: Lấy danh sách task và nhóm theo phân loại
-                databaseReference.child("tasks").addValueEventListener(new ValueEventListener() {
+                databaseReference.child("tasks").addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        // Ẩn dialog loading
+                        if (loadingDialog != null && loadingDialog.isShowing()) {
+                            loadingDialog.dismiss();
+                        }
+
                         Map<String, List<ItemTask>> tasksByCategory = new HashMap<>(); // categoryId -> List<ItemTask>
                         int taskCount = 0;
 
                         for (DataSnapshot taskSnapshot : snapshot.getChildren()) {
-                            ItemTask task = taskSnapshot.getValue(ItemTask.class);
-                            if (task != null && coupleId.equals(task.getCoupleId())) {
+                            String taskId = taskSnapshot.getKey();
+                            String taskCoupleId = taskSnapshot.child("couple_id").getValue(String.class);
+                            String title = taskSnapshot.child("title").getValue(String.class);
+                            String categoryId = taskSnapshot.child("category_id").getValue(String.class);
+                            String deadline = taskSnapshot.child("deadline").getValue(String.class);
+                            String status = taskSnapshot.child("status").getValue(String.class);
+                            String createdAt = taskSnapshot.child("created_at").getValue(String.class);
+
+                            if (taskId != null && taskCoupleId != null && coupleId.equals(taskCoupleId)) {
+                                ItemTask task = new ItemTask();
+                                task.setId(taskId);
+                                task.setCoupleId(taskCoupleId);
+                                task.setTitle(title != null ? title : "Không có tiêu đề");
+                                task.setCategoryId(categoryId);
+                                task.setDeadline(deadline);
+                                task.setStatus(status != null ? status : "normal");
+                                task.setCreatedAt(createdAt);
+
                                 taskCount++;
-                                String categoryId = task.getCategoryId();
+                                Log.d("TodolistCategoryFragment", "Task found: " + task.getTitle() + ", Category ID: " + task.getCategoryId());
+
                                 if (categoryId != null && categoryMap.containsKey(categoryId)) {
                                     tasksByCategory.computeIfAbsent(categoryId, k -> new ArrayList<>()).add(task);
-                                    Log.d("TodolistCategoryFragment", "Task found: " + task.getTitle() + ", Category ID: " + categoryId);
+                                } else {
+                                    Log.d("TodolistCategoryFragment", "Task " + task.getTitle() + " không thuộc category nào phù hợp");
                                 }
+                            } else {
+                                Log.d("TodolistCategoryFragment", "Bỏ qua task với ID: " + taskId + " do không khớp coupleId hoặc dữ liệu không đầy đủ");
                             }
                         }
 
@@ -166,17 +226,27 @@ public class TodolistCategoryFragment extends Fragment {
                             String categoryName = entry.getValue();
                             List<ItemTask> tasks = tasksByCategory.getOrDefault(categoryId, new ArrayList<>());
                             groupList.add(new ItemTaskGroup(categoryName, tasks)); // Hiển thị tất cả phân loại
+                            Log.d("TodolistCategoryFragment", "Group created: " + categoryName + ", Task count: " + tasks.size());
                         }
 
                         groupAdapter.notifyDataSetChanged();
 
-                        // Không cần hiển thị thông báo "Chưa có công việc hoặc phân loại nào" vì đã có ít nhất 6 phân loại
-                        emptyMessage.setVisibility(View.GONE);
-                        recyclerGroup.setVisibility(View.VISIBLE);
+                        // Hiển thị thông báo nếu không có task nào
+                        if (taskCount == 0) {
+                            emptyMessage.setVisibility(View.VISIBLE);
+                            recyclerGroup.setVisibility(View.VISIBLE);
+                        } else {
+                            emptyMessage.setVisibility(View.GONE);
+                            recyclerGroup.setVisibility(View.VISIBLE);
+                        }
                     }
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
+                        // Ẩn dialog loading nếu có lỗi
+                        if (loadingDialog != null && loadingDialog.isShowing()) {
+                            loadingDialog.dismiss();
+                        }
                         Log.e("TodolistCategoryFragment", "Lỗi khi lấy danh sách task: " + error.getMessage());
                         if (getActivity() != null) {
                             Toast.makeText(getActivity(), "Lỗi khi lấy danh sách task: " + error.getMessage(), Toast.LENGTH_LONG).show();
@@ -188,6 +258,10 @@ public class TodolistCategoryFragment extends Fragment {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
+                // Ẩn dialog loading nếu có lỗi
+                if (loadingDialog != null && loadingDialog.isShowing()) {
+                    loadingDialog.dismiss();
+                }
                 Log.e("TodolistCategoryFragment", "Lỗi khi lấy danh sách phân loại: " + error.getMessage());
                 if (getActivity() != null) {
                     Toast.makeText(getActivity(), "Lỗi khi lấy danh sách phân loại: " + error.getMessage(), Toast.LENGTH_LONG).show();

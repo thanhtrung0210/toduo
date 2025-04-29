@@ -1,6 +1,7 @@
 package com.pipoxniko.toduo.adapter;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,8 +12,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.pipoxniko.toduo.R;
 import com.pipoxniko.toduo.model.ItemTaskGroup;
-
-import java.util.ArrayList;
 import java.util.List;
 
 public class ItemTaskGroupAdapter extends RecyclerView.Adapter<ItemTaskGroupAdapter.GroupViewHolder> {
@@ -29,21 +28,51 @@ public class ItemTaskGroupAdapter extends RecyclerView.Adapter<ItemTaskGroupAdap
     @Override
     public GroupViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_task_group, parent, false);
-        return new GroupViewHolder(view, context);
+        return new GroupViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull GroupViewHolder holder, int position) {
         ItemTaskGroup group = groupList.get(position);
-        holder.title.setText(group.getGroupTitle());
-        holder.taskAdapter.updateTasks(group.getTasks());
-        holder.recyclerView.setVisibility(group.isExpanded() ? View.VISIBLE : View.GONE);
-        holder.toggleIcon.setImageResource(group.isExpanded() ? R.drawable.todolist_close_task_group : R.drawable.todolist_open_task_group);
+        holder.groupTitle.setText(group.getGroupName());
 
-        holder.header.setOnClickListener(v -> {
+        // Log số lượng task trong nhóm
+        int taskCount = (group.getTaskList() != null) ? group.getTaskList().size() : 0;
+        Log.d("ItemTaskGroupAdapter", "Binding group: " + group.getGroupName() + ", Task count: " + taskCount);
+
+        // Thiết lập RecyclerView con cho danh sách task
+        ItemTaskAdapter taskAdapter = new ItemTaskAdapter(group.getTaskList(), context);
+        holder.taskRecyclerView.setLayoutManager(new LinearLayoutManager(context));
+        holder.taskRecyclerView.setAdapter(taskAdapter);
+
+        // Cập nhật trạng thái mở/đóng
+        updateExpandState(holder, group);
+
+        // Xử lý sự kiện nhấn vào tiêu đề nhóm để mở/đóng
+        holder.groupHeader.setOnClickListener(v -> {
             group.setExpanded(!group.isExpanded());
-            notifyItemChanged(position);
+            updateExpandState(holder, group);
         });
+    }
+
+    private void updateExpandState(GroupViewHolder holder, ItemTaskGroup group) {
+        if (group.getTaskList() == null || group.getTaskList().isEmpty()) {
+            // Ẩn RecyclerView nếu nhóm không có task
+            holder.taskRecyclerView.setVisibility(View.GONE);
+            Log.d("ItemTaskGroupAdapter", "Group " + group.getGroupName() + " has no tasks, hiding RecyclerView");
+        } else {
+            // Hiển thị hoặc ẩn RecyclerView dựa trên trạng thái isExpanded
+            if (group.isExpanded()) {
+                holder.taskRecyclerView.setVisibility(View.VISIBLE);
+                holder.expandIcon.setImageResource(R.drawable.todolist_open_task_group); // Mũi tên lên
+                Log.d("ItemTaskGroupAdapter", "Group " + group.getGroupName() + " is expanded, showing tasks");
+            } else {
+                holder.taskRecyclerView.setVisibility(View.GONE);
+                holder.expandIcon.setImageResource(R.drawable.todolist_close_task_group); // Mũi tên xuống
+                Log.d("ItemTaskGroupAdapter", "Group " + group.getGroupName() + " is collapsed, hiding tasks");
+            }
+            holder.expandIcon.setVisibility(View.VISIBLE); // Hiển thị icon nếu có task
+        }
     }
 
     @Override
@@ -52,24 +81,17 @@ public class ItemTaskGroupAdapter extends RecyclerView.Adapter<ItemTaskGroupAdap
     }
 
     public static class GroupViewHolder extends RecyclerView.ViewHolder {
-        TextView title;
-        ImageView toggleIcon;
-        RecyclerView recyclerView;
-        View header;
-        ItemTaskAdapter taskAdapter;
-        LinearLayoutManager layoutManager;
+        TextView groupTitle;
+        ImageView expandIcon;
+        RecyclerView taskRecyclerView;
+        View groupHeader;
 
-        public GroupViewHolder(@NonNull View itemView, Context context) {
+        public GroupViewHolder(@NonNull View itemView) {
             super(itemView);
-            title = itemView.findViewById(R.id.task_group_title);
-            toggleIcon = itemView.findViewById(R.id.task_group_toggle);
-            recyclerView = itemView.findViewById(R.id.task_recycler);
-            header = itemView.findViewById(R.id.task_group_header);
-
-            layoutManager = new LinearLayoutManager(itemView.getContext());
-            recyclerView.setLayoutManager(layoutManager);
-            taskAdapter = new ItemTaskAdapter(new ArrayList<>(), context);
-            recyclerView.setAdapter(taskAdapter);
+            groupHeader = itemView.findViewById(R.id.task_group_header);
+            groupTitle = itemView.findViewById(R.id.task_group_title);
+            expandIcon = itemView.findViewById(R.id.task_group_toggle);
+            taskRecyclerView = itemView.findViewById(R.id.task_recycler);
         }
     }
 }

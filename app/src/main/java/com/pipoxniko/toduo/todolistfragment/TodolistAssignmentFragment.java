@@ -1,5 +1,8 @@
 package com.pipoxniko.toduo.todolistfragment;
 
+import android.app.AlertDialog;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -39,6 +42,7 @@ public class TodolistAssignmentFragment extends Fragment {
     private String currentUserId;
     private String user1Nickname;
     private String user2Nickname;
+    private AlertDialog loadingDialog; // Thêm dialog loading
 
     @Nullable
     @Override
@@ -62,11 +66,22 @@ public class TodolistAssignmentFragment extends Fragment {
 
         if (getContext() != null) {
             recyclerGroup.setLayoutManager(new LinearLayoutManager(getContext()));
+            recyclerGroup.setNestedScrollingEnabled(false); // Tắt cuộn của RecyclerView để NestedScrollView xử lý
         }
 
         // Khởi tạo adapter
         groupAdapter = new ItemTaskGroupAdapter(groupList, getContext());
         recyclerGroup.setAdapter(groupAdapter);
+
+        // Khởi tạo dialog loading
+        if (getActivity() != null) {
+            View loadingView = inflater.inflate(R.layout.custom_loading_dialog, null);
+            loadingDialog = new AlertDialog.Builder(getActivity())
+                    .setView(loadingView)
+                    .setCancelable(false)
+                    .create();
+            loadingDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        }
 
         // Khởi tạo Firebase
         databaseReference = FirebaseDatabase.getInstance().getReference("TODUO");
@@ -86,31 +101,55 @@ public class TodolistAssignmentFragment extends Fragment {
 
                     if (coupleId != null) {
                         // Tìm nickname của user2
-                        databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
+                        databaseReference.child("couples").child(coupleId).addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
-                            public void onDataChange(@NonNull DataSnapshot usersSnapshot) {
-                                for (DataSnapshot userSnapshot : usersSnapshot.getChildren()) {
-                                    String userId = userSnapshot.getKey();
-                                    String userCoupleId = userSnapshot.child("coupleId").getValue(String.class);
-                                    if (userId != null && !userId.equals(currentUserId) && coupleId.equals(userCoupleId)) {
-                                        user2Nickname = userSnapshot.child("nickname").getValue(String.class);
-                                        if (user2Nickname == null || user2Nickname.isEmpty()) {
-                                            user2Nickname = "User 2";
-                                        }
-                                        Log.d("TodolistAssignmentFragment", "User2 Nickname: " + user2Nickname);
-                                        break;
+                            public void onDataChange(@NonNull DataSnapshot coupleSnapshot) {
+                                if (coupleSnapshot.exists()) {
+                                    String user1Id = coupleSnapshot.child("user1_id").getValue(String.class);
+                                    String user2Id = coupleSnapshot.child("user2_id").getValue(String.class);
+
+                                    if (user1Id != null && user2Id != null) {
+                                        String partnerId = user1Id.equals(currentUserId) ? user2Id : user1Id;
+                                        databaseReference.child("users").child(partnerId).addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot partnerSnapshot) {
+                                                if (partnerSnapshot.exists()) {
+                                                    user2Nickname = partnerSnapshot.child("nickname").getValue(String.class);
+                                                    if (user2Nickname == null || user2Nickname.isEmpty()) {
+                                                        user2Nickname = "User 2";
+                                                    }
+                                                    Log.d("TodolistAssignmentFragment", "User2 Nickname: " + user2Nickname);
+                                                    loadTasksFromFirebase();
+                                                } else {
+                                                    user2Nickname = "User 2";
+                                                    Log.e("TodolistAssignmentFragment", "Không tìm thấy thông tin của user2");
+                                                    loadTasksFromFirebase();
+                                                }
+                                            }
+
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError error) {
+                                                user2Nickname = "User 2";
+                                                Log.e("TodolistAssignmentFragment", "Lỗi khi lấy nickname user2: " + error.getMessage());
+                                                loadTasksFromFirebase();
+                                            }
+                                        });
+                                    } else {
+                                        user2Nickname = "User 2";
+                                        Log.e("TodolistAssignmentFragment", "Không tìm thấy user1_id hoặc user2_id trong couple");
+                                        loadTasksFromFirebase();
                                     }
-                                }
-                                if (user2Nickname == null) {
+                                } else {
                                     user2Nickname = "User 2";
+                                    Log.e("TodolistAssignmentFragment", "Không tìm thấy thông tin couple");
+                                    loadTasksFromFirebase();
                                 }
-                                loadTasksFromFirebase();
                             }
 
                             @Override
                             public void onCancelled(@NonNull DatabaseError error) {
-                                Log.e("TodolistAssignmentFragment", "Lỗi khi lấy nickname user2: " + error.getMessage());
                                 user2Nickname = "User 2";
+                                Log.e("TodolistAssignmentFragment", "Lỗi khi lấy thông tin couple: " + error.getMessage());
                                 loadTasksFromFirebase();
                             }
                         });
@@ -142,6 +181,16 @@ public class TodolistAssignmentFragment extends Fragment {
         return mView;
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        // Đóng dialog loading nếu đang hiển thị
+        if (loadingDialog != null && loadingDialog.isShowing()) {
+            loadingDialog.dismiss();
+        }
+        loadingDialog = null;
+    }
+
     private void initializeEmptyGroups() {
         groupList.clear();
         groupList.add(new ItemTaskGroup(user1Nickname != null ? user1Nickname : "User 1", new ArrayList<>()));
@@ -153,30 +202,62 @@ public class TodolistAssignmentFragment extends Fragment {
     }
 
     private void loadTasksFromFirebase() {
-        databaseReference.child("tasks").addValueEventListener(new ValueEventListener() {
+        // Hiển thị dialog loading
+        if (loadingDialog != null) {
+            loadingDialog.show();
+        }
+
+        databaseReference.child("tasks").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                // Ẩn dialog loading
+                if (loadingDialog != null && loadingDialog.isShowing()) {
+                    loadingDialog.dismiss();
+                }
+
                 List<ItemTask> user1Tasks = new ArrayList<>();
                 List<ItemTask> user2Tasks = new ArrayList<>();
                 List<ItemTask> bothTasks = new ArrayList<>();
 
                 int taskCount = 0;
                 for (DataSnapshot taskSnapshot : snapshot.getChildren()) {
-                    ItemTask task = taskSnapshot.getValue(ItemTask.class);
-                    if (task != null && coupleId.equals(task.getCoupleId())) {
+                    String taskId = taskSnapshot.getKey();
+                    String taskCoupleId = taskSnapshot.child("couple_id").getValue(String.class);
+                    String title = taskSnapshot.child("title").getValue(String.class);
+                    String assignment = taskSnapshot.child("assignment").getValue(String.class);
+                    String deadline = taskSnapshot.child("deadline").getValue(String.class);
+                    String status = taskSnapshot.child("status").getValue(String.class);
+                    String createdAt = taskSnapshot.child("created_at").getValue(String.class);
+
+                    if (taskId != null && taskCoupleId != null && coupleId.equals(taskCoupleId)) {
+                        ItemTask task = new ItemTask();
+                        task.setId(taskId);
+                        task.setCoupleId(taskCoupleId);
+                        task.setTitle(title != null ? title : "Không có tiêu đề");
+                        task.setAssignment(assignment);
+                        task.setDeadline(deadline);
+                        task.setStatus(status != null ? status : "normal");
+                        task.setCreatedAt(createdAt);
+
                         taskCount++;
                         Log.d("TodolistAssignmentFragment", "Task found: " + task.getTitle() + ", Assignment: " + task.getAssignment());
-                        String assignment = task.getAssignment();
 
                         if (assignment != null) {
                             if (assignment.equals(user1Nickname)) {
                                 user1Tasks.add(task);
+                                Log.d("TodolistAssignmentFragment", "Added to " + user1Nickname + ": " + task.getTitle());
                             } else if (assignment.equals(user2Nickname)) {
                                 user2Tasks.add(task);
+                                Log.d("TodolistAssignmentFragment", "Added to " + user2Nickname + ": " + task.getTitle());
                             } else if (assignment.equals("Cả hai")) {
                                 bothTasks.add(task);
+                                Log.d("TodolistAssignmentFragment", "Added to Cả hai: " + task.getTitle());
                             }
+                        } else {
+                            Log.d("TodolistAssignmentFragment", "Task " + task.getTitle() + " không có assignment");
                         }
+                    } else {
+                        Log.d("TodolistAssignmentFragment", "Bỏ qua task với ID: " + taskId + " do không khớp coupleId hoặc dữ liệu không đầy đủ");
                     }
                 }
 
@@ -202,6 +283,10 @@ public class TodolistAssignmentFragment extends Fragment {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
+                // Ẩn dialog loading nếu có lỗi
+                if (loadingDialog != null && loadingDialog.isShowing()) {
+                    loadingDialog.dismiss();
+                }
                 Log.e("TodolistAssignmentFragment", "Lỗi khi lấy danh sách task: " + error.getMessage());
                 if (getActivity() != null) {
                     Toast.makeText(getActivity(), "Lỗi khi lấy danh sách task: " + error.getMessage(), Toast.LENGTH_LONG).show();

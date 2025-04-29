@@ -5,19 +5,17 @@ public class ItemTask {
     private String coupleId;
     private String title;
     private String description;
-    private String deadline; // Định dạng: "yyyy-MM-dd HH:mm"
+    private String deadline;
     private String categoryId;
     private String assignment;
     private String status;
-    private String createdAt;
+    private String createdAt; // Thêm trường createdAt để ánh xạ với created_at trên Firebase
+    private boolean isChecked;
 
     public ItemTask() {
-        // Constructor mặc định cho Firebase
     }
 
-    public ItemTask(String id, String coupleId, String title, String description, String deadline,
-                    String categoryId, String assignment, String status, String createdAt) {
-        this.id = id;
+    public ItemTask(String coupleId, String title, String description, String deadline, String categoryId, String assignment, String status) {
         this.coupleId = coupleId;
         this.title = title;
         this.description = description;
@@ -25,10 +23,9 @@ public class ItemTask {
         this.categoryId = categoryId;
         this.assignment = assignment;
         this.status = status;
-        this.createdAt = createdAt;
+        this.isChecked = false;
     }
 
-    // Getters và Setters
     public String getId() {
         return id;
     }
@@ -101,16 +98,15 @@ public class ItemTask {
         this.createdAt = createdAt;
     }
 
-    // Để tương thích với logic hiện tại của ItemTaskAdapter
-    public String getContent() {
-        return title;
-    }
-
     public boolean isChecked() {
-        return "completed".equals(status);
+        return isChecked;
     }
 
     public void setChecked(boolean checked) {
-        this.status = checked ? "completed" : "normal";
+        isChecked = checked;
+    }
+
+    public String getContent() {
+        return title;
     }
 }

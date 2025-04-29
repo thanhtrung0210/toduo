@@ -3,26 +3,37 @@ package com.pipoxniko.toduo.model;
 import java.util.List;
 
 public class ItemTaskGroup {
-    private String groupTitle;
-    private List<ItemTask> tasks;
+    private String groupName;
+    private List<ItemTask> taskList;
     private boolean isExpanded;
 
-    public ItemTaskGroup(String groupTitle, List<ItemTask> tasks) {
-        this.groupTitle = groupTitle;
-        this.tasks = tasks;
-        this.isExpanded = false;
+    public ItemTaskGroup(String groupName, List<ItemTask> taskList) {
+        this.groupName = groupName;
+        this.taskList = taskList;
+        this.isExpanded = (taskList != null && !taskList.isEmpty()); // Mở mặc định nếu nhóm có task
     }
 
-    public ItemTaskGroup(String groupTitle, List<ItemTask> tasks, boolean isExpanded) {
-        this.groupTitle = groupTitle;
-        this.tasks = tasks;
-        this.isExpanded = isExpanded;
+    public String getGroupName() {
+        return groupName;
     }
 
-    public String getGroupTitle() { return groupTitle; }
-    public void setGroupTitle(String groupTitle) { this.groupTitle = groupTitle; }
-    public List<ItemTask> getTasks() { return tasks; }
-    public void setTasks(List<ItemTask> tasks) { this.tasks = tasks; }
-    public boolean isExpanded() { return isExpanded; }
-    public void setExpanded(boolean expanded) { isExpanded = expanded; }
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
+    }
+
+    public List<ItemTask> getTaskList() {
+        return taskList;
+    }
+
+    public void setTaskList(List<ItemTask> taskList) {
+        this.taskList = taskList;
+    }
+
+    public boolean isExpanded() {
+        return isExpanded;
+    }
+
+    public void setExpanded(boolean expanded) {
+        isExpanded = expanded;
+    }
 }
