@@ -16,7 +16,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -42,6 +41,26 @@ public class TodolistCategoryFragment extends Fragment {
     private DatabaseReference databaseReference;
     private String coupleId;
     private AlertDialog loadingDialog;
+    private ValueEventListener categoriesListener;
+    private ValueEventListener tasksListener;
+
+    public static TodolistCategoryFragment newInstance(String coupleId) {
+        TodolistCategoryFragment fragment = new TodolistCategoryFragment();
+        Bundle args = new Bundle();
+        args.putString("coupleId", coupleId);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            coupleId = getArguments().getString("coupleId");
+        }
+        databaseReference = FirebaseDatabase.getInstance().getReference("TODUO");
+        groupList = new ArrayList<>();
+    }
 
     @Nullable
     @Override
@@ -78,43 +97,22 @@ public class TodolistCategoryFragment extends Fragment {
             loadingDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         }
 
-        databaseReference = FirebaseDatabase.getInstance().getReference("TODUO");
-        String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-
-        databaseReference.child("users").child(currentUserId).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    coupleId = snapshot.child("coupleId").getValue(String.class);
-                    Log.d("TodolistCategoryFragment", "CoupleId: " + coupleId);
-                    if (coupleId != null) {
-                        loadCategoriesAndTasks();
-                    } else {
-                        if (getActivity() != null) {
-                            Toast.makeText(getActivity(), "Bạn chưa ghép đôi, vui lòng ghép đôi để sử dụng tính năng này", Toast.LENGTH_LONG).show();
-                        }
-                        showEmptyMessage();
-                    }
-                } else {
-                    Log.e("TodolistCategoryFragment", "Không tìm thấy thông tin người dùng");
-                    if (getActivity() != null) {
-                        Toast.makeText(getActivity(), "Không tìm thấy thông tin người dùng", Toast.LENGTH_LONG).show();
-                    }
-                    showEmptyMessage();
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Log.e("TodolistCategoryFragment", "Lỗi khi lấy coupleId: " + error.getMessage());
-                if (getActivity() != null) {
-                    Toast.makeText(getActivity(), "Lỗi khi lấy thông tin: " + error.getMessage(), Toast.LENGTH_LONG).show();
-                }
-                showEmptyMessage();
-            }
-        });
+        if (coupleId == null) {
+            Toast.makeText(getActivity(), "Bạn chưa ghép đôi, hiển thị danh sách mặc định", Toast.LENGTH_LONG).show();
+            showEmptyMessage();
+        } else {
+            loadCategoriesAndTasks();
+        }
 
         return mView;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (coupleId != null) {
+            loadCategoriesAndTasks();
+        }
     }
 
     @Override
@@ -122,6 +120,12 @@ public class TodolistCategoryFragment extends Fragment {
         super.onDestroyView();
         if (loadingDialog != null && loadingDialog.isShowing()) {
             loadingDialog.dismiss();
+        }
+        if (categoriesListener != null) {
+            databaseReference.child("task_categories").removeEventListener(categoriesListener);
+        }
+        if (tasksListener != null) {
+            databaseReference.child("tasks").removeEventListener(tasksListener);
         }
         loadingDialog = null;
     }
@@ -138,7 +142,14 @@ public class TodolistCategoryFragment extends Fragment {
             loadingDialog.show();
         }
 
-        databaseReference.child("task_categories").addListenerForSingleValueEvent(new ValueEventListener() {
+        if (categoriesListener != null) {
+            databaseReference.child("task_categories").removeEventListener(categoriesListener);
+        }
+        if (tasksListener != null) {
+            databaseReference.child("tasks").removeEventListener(tasksListener);
+        }
+
+        categoriesListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 Map<String, String> categoryMap = new HashMap<>();
@@ -164,7 +175,10 @@ public class TodolistCategoryFragment extends Fragment {
                     return;
                 }
 
-                databaseReference.child("tasks").addListenerForSingleValueEvent(new ValueEventListener() {
+                if (tasksListener != null) {
+                    databaseReference.child("tasks").removeEventListener(tasksListener);
+                }
+                tasksListener = new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         if (loadingDialog != null && loadingDialog.isShowing()) {
@@ -172,7 +186,7 @@ public class TodolistCategoryFragment extends Fragment {
                         }
 
                         Map<String, List<ItemTask>> tasksByCategory = new HashMap<>();
-                        List<ItemTask> otherTasks = new ArrayList<>(); // Thêm danh sách cho nhóm "Khác"
+                        List<ItemTask> otherTasks = new ArrayList<>();
                         int taskCount = 0;
 
                         for (DataSnapshot taskSnapshot : snapshot.getChildren()) {
@@ -181,11 +195,11 @@ public class TodolistCategoryFragment extends Fragment {
                             String title = taskSnapshot.child("title").getValue(String.class);
                             String categoryId = taskSnapshot.child("category_id").getValue(String.class);
                             String deadline = taskSnapshot.child("deadline").getValue(String.class);
+                            Boolean completed = taskSnapshot.child("completed").getValue(Boolean.class);
                             String status = taskSnapshot.child("status").getValue(String.class);
                             String createdAt = taskSnapshot.child("created_at").getValue(String.class);
 
-                            if (taskId != null && taskCoupleId != null && coupleId.equals(taskCoupleId)) {
-                                // Chỉ xử lý task có trạng thái "normal" hoặc "completed"
+                            if (taskId != null && taskCoupleId != null && coupleId != null && coupleId.equals(taskCoupleId)) {
                                 if (status == null || (!status.equals("normal") && !status.equals("completed"))) {
                                     Log.d("TodolistCategoryFragment", "Bỏ qua task " + taskId + " do trạng thái không phù hợp: " + status);
                                     continue;
@@ -197,16 +211,18 @@ public class TodolistCategoryFragment extends Fragment {
                                 task.setTitle(title != null ? title : "Không có tiêu đề");
                                 task.setCategoryId(categoryId);
                                 task.setDeadline(deadline);
+                                task.setCompleted(completed != null ? completed : false);
                                 task.setStatus(status != null ? status : "normal");
                                 task.setCreatedAt(createdAt);
+                                task.setChecked(task.isCompleted());
 
                                 taskCount++;
-                                Log.d("TodolistCategoryFragment", "Task found: " + task.getTitle() + ", Category ID: " + task.getCategoryId());
+                                Log.d("TodolistCategoryFragment", "Task found: " + task.getTitle() + ", Category ID: " + task.getCategoryId() + ", Completed: " + task.isCompleted());
 
                                 if (categoryId != null && categoryMap.containsKey(categoryId)) {
                                     tasksByCategory.computeIfAbsent(categoryId, k -> new ArrayList<>()).add(task);
                                 } else {
-                                    otherTasks.add(task); // Thêm task không có phân loại vào nhóm "Khác"
+                                    otherTasks.add(task);
                                     Log.d("TodolistCategoryFragment", "Task " + task.getTitle() + " được thêm vào nhóm Khác");
                                 }
                             } else {
@@ -225,7 +241,6 @@ public class TodolistCategoryFragment extends Fragment {
                             Log.d("TodolistCategoryFragment", "Group created: " + categoryName + ", Task count: " + tasks.size());
                         }
 
-                        // Thêm nhóm "Khác" nếu có task
                         if (!otherTasks.isEmpty()) {
                             groupList.add(new ItemTaskGroup("Khác", otherTasks));
                             Log.d("TodolistCategoryFragment", "Group created: Khác, Task count: " + otherTasks.size());
@@ -253,7 +268,8 @@ public class TodolistCategoryFragment extends Fragment {
                         }
                         showEmptyMessage();
                     }
-                });
+                };
+                databaseReference.child("tasks").addValueEventListener(tasksListener);
             }
 
             @Override
@@ -267,6 +283,7 @@ public class TodolistCategoryFragment extends Fragment {
                 }
                 showEmptyMessage();
             }
-        });
+        };
+        databaseReference.child("task_categories").addValueEventListener(categoriesListener);
     }
 }

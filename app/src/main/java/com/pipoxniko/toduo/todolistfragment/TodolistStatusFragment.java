@@ -8,7 +8,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -36,12 +35,8 @@ public class TodolistStatusFragment extends Fragment {
     private List<ItemTaskGroup> groupList;
     private ItemTaskGroupAdapter groupAdapter;
     private RecyclerView recyclerGroup;
-    private TextView emptyMessage;
-    private AlertDialog loadingDialog; // Sửa kiểu thành AlertDialog
-
-    public TodolistStatusFragment() {
-        // Required empty public constructor
-    }
+    private AlertDialog loadingDialog;
+    private ValueEventListener tasksListener;
 
     public static TodolistStatusFragment newInstance(String coupleId) {
         TodolistStatusFragment fragment = new TodolistStatusFragment();
@@ -71,36 +66,68 @@ public class TodolistStatusFragment extends Fragment {
         groupAdapter = new ItemTaskGroupAdapter(groupList, getContext());
         recyclerGroup.setAdapter(groupAdapter);
 
-        // Khởi tạo dialog loading
         if (getActivity() != null) {
             View loadingView = inflater.inflate(R.layout.custom_loading_dialog, null);
             loadingDialog = new AlertDialog.Builder(getActivity())
                     .setView(loadingView)
                     .setCancelable(false)
                     .create();
-
-            // Xóa background mặc định của dialog
             if (loadingDialog.getWindow() != null) {
                 loadingDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
             }
         }
 
-        loadTasksFromFirebase();
+        if (coupleId == null) {
+            Toast.makeText(getActivity(), "Bạn chưa ghép đôi, hiển thị danh sách mặc định", Toast.LENGTH_LONG).show();
+            initializeEmptyGroups();
+        } else {
+            loadTasksFromFirebase();
+        }
 
         return view;
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (coupleId != null) {
+            loadTasksFromFirebase();
+        }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (loadingDialog != null && loadingDialog.isShowing()) {
+            loadingDialog.dismiss();
+        }
+        if (tasksListener != null) {
+            databaseReference.child("tasks").removeEventListener(tasksListener);
+        }
+        loadingDialog = null;
+    }
+
+    private void initializeEmptyGroups() {
+        groupList.clear();
+        groupList.add(new ItemTaskGroup("Bình thường", new ArrayList<>()));
+        groupList.add(new ItemTaskGroup("Đã hoàn thành", new ArrayList<>()));
+        groupList.add(new ItemTaskGroup("Đang chờ sửa", new ArrayList<>()));
+        groupList.add(new ItemTaskGroup("Đang chờ xóa", new ArrayList<>()));
+        groupAdapter.notifyDataSetChanged();
+        recyclerGroup.setVisibility(View.VISIBLE);
+    }
+
     private void loadTasksFromFirebase() {
-        if (loadingDialog != null) {
-            loadingDialog.show();
+        if (loadingDialog != null) loadingDialog.show();
+
+        if (tasksListener != null) {
+            databaseReference.child("tasks").removeEventListener(tasksListener);
         }
 
-        databaseReference.child("tasks").addValueEventListener(new ValueEventListener() {
+        tasksListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (loadingDialog != null && loadingDialog.isShowing()) {
-                    loadingDialog.dismiss();
-                }
+                if (loadingDialog != null && loadingDialog.isShowing()) loadingDialog.dismiss();
 
                 List<ItemTask> normalTasks = new ArrayList<>();
                 List<ItemTask> completedTasks = new ArrayList<>();
@@ -113,60 +140,49 @@ public class TodolistStatusFragment extends Fragment {
                     String taskCoupleId = taskSnapshot.child("couple_id").getValue(String.class);
                     String title = taskSnapshot.child("title").getValue(String.class);
                     String deadline = taskSnapshot.child("deadline").getValue(String.class);
+                    Boolean completed = taskSnapshot.child("completed").getValue(Boolean.class);
                     String status = taskSnapshot.child("status").getValue(String.class);
                     String createdAt = taskSnapshot.child("created_at").getValue(String.class);
                     String description = taskSnapshot.child("description").getValue(String.class);
                     String categoryId = taskSnapshot.child("category_id").getValue(String.class);
                     String assignment = taskSnapshot.child("assignment").getValue(String.class);
 
-                    if (taskId != null && taskCoupleId != null && coupleId.equals(taskCoupleId)) {
+                    if (taskId != null && taskCoupleId != null && coupleId != null && coupleId.equals(taskCoupleId)) {
                         ItemTask task = new ItemTask();
                         task.setId(taskId);
                         task.setCoupleId(taskCoupleId);
                         task.setTitle(title != null ? title : "Không có tiêu đề");
                         task.setDeadline(deadline);
+                        task.setCompleted(completed != null ? completed : false);
                         task.setStatus(status != null ? status : "normal");
                         task.setCreatedAt(createdAt);
                         task.setDescription(description);
                         task.setCategoryId(categoryId);
                         task.setAssignment(assignment != null ? assignment : "Cả hai");
-                        task.setChecked("completed".equals(task.getStatus()));
+                        task.setChecked(task.isCompleted());
 
                         taskCount++;
-                        Log.d("TodolistStatusFragment", "Task found: " + task.getTitle() + ", Status: " + task.getStatus());
+                        Log.d("TodolistStatusFragment", "Task found: " + task.getTitle() + ", Completed: " + task.isCompleted() + ", Status: " + task.getStatus());
 
-                        switch (task.getStatus()) {
-                            case "normal":
-                                normalTasks.add(task);
-                                Log.d("TodolistStatusFragment", "Added to Bình thường: " + task.getTitle());
-                                break;
-                            case "completed":
+                        if ("pending_edit".equals(task.getStatus())) {
+                            pendingEditTasks.add(task);
+                        } else if ("pending_delete".equals(task.getStatus())) {
+                            pendingDeleteTasks.add(task);
+                        } else {
+                            if (task.isCompleted()) {
                                 completedTasks.add(task);
-                                Log.d("TodolistStatusFragment", "Added to Đã hoàn thành: " + task.getTitle());
-                                break;
-                            case "pending_edit":
-                                pendingEditTasks.add(task);
-                                Log.d("TodolistStatusFragment", "Added to Đang chờ sửa: " + task.getTitle());
-                                break;
-                            case "pending_delete":
-                                pendingDeleteTasks.add(task);
-                                Log.d("TodolistStatusFragment", "Added to Đang chờ xóa: " + task.getTitle());
-                                break;
-                            default:
+                            } else {
                                 normalTasks.add(task);
-                                Log.d("TodolistStatusFragment", "Trạng thái không xác định, mặc định thêm vào Bình thường: " + task.getTitle());
-                                break;
+                            }
                         }
-                    } else {
-                        Log.d("TodolistStatusFragment", "Bỏ qua task với ID: " + taskId + " do không khớp coupleId hoặc dữ liệu không đầy đủ");
                     }
                 }
 
-                Log.d("TodolistStatusFragment", "Tổng số task tìm thấy: " + taskCount);
-                Log.d("TodolistStatusFragment", "Bình thường: " + normalTasks.size() + " tasks");
-                Log.d("TodolistStatusFragment", "Đã hoàn thành: " + completedTasks.size() + " tasks");
-                Log.d("TodolistStatusFragment", "Đang chờ sửa: " + pendingEditTasks.size() + " tasks");
-                Log.d("TodolistStatusFragment", "Đang chờ xóa: " + pendingDeleteTasks.size() + " tasks");
+                Log.d("TodolistStatusFragment", "Tổng số task: " + taskCount);
+                Log.d("TodolistStatusFragment", "Bình thường: " + normalTasks.size());
+                Log.d("TodolistStatusFragment", "Đã hoàn thành: " + completedTasks.size());
+                Log.d("TodolistStatusFragment", "Đang chờ sửa: " + pendingEditTasks.size());
+                Log.d("TodolistStatusFragment", "Đang chờ xóa: " + pendingDeleteTasks.size());
 
                 groupList.clear();
                 groupList.add(new ItemTaskGroup("Bình thường", normalTasks));
@@ -175,38 +191,18 @@ public class TodolistStatusFragment extends Fragment {
                 groupList.add(new ItemTaskGroup("Đang chờ xóa", pendingDeleteTasks));
 
                 groupAdapter.notifyDataSetChanged();
-
-                if (taskCount == 0) {
-                    emptyMessage.setVisibility(View.VISIBLE);
-                    recyclerGroup.setVisibility(View.VISIBLE);
-                } else {
-                    emptyMessage.setVisibility(View.GONE);
-                    recyclerGroup.setVisibility(View.VISIBLE);
-                }
+                recyclerGroup.setVisibility(View.VISIBLE);
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                if (loadingDialog != null && loadingDialog.isShowing()) {
-                    loadingDialog.dismiss();
-                }
-                Log.e("TodolistStatusFragment", "Lỗi khi lấy danh sách task: " + error.getMessage());
-                if (getActivity() != null) {
-                    Toast.makeText(getActivity(), "Lỗi khi lấy danh sách task: " + error.getMessage(), Toast.LENGTH_LONG).show();
-                }
+                if (loadingDialog != null && loadingDialog.isShowing()) loadingDialog.dismiss();
+                Log.e("TodolistStatusFragment", "Lỗi: " + error.getMessage());
+                if (getActivity() != null) Toast.makeText(getActivity(), "Lỗi khi tải task: " + error.getMessage(), Toast.LENGTH_LONG).show();
                 initializeEmptyGroups();
             }
-        });
-    }
+        };
 
-    private void initializeEmptyGroups() {
-        groupList.clear();
-        groupList.add(new ItemTaskGroup("Bình thường", new ArrayList<>()));
-        groupList.add(new ItemTaskGroup("Đã hoàn thành", new ArrayList<>()));
-        groupList.add(new ItemTaskGroup("Đang chờ sửa", new ArrayList<>()));
-        groupList.add(new ItemTaskGroup("Đang chờ xóa", new ArrayList<>()));
-        groupAdapter.notifyDataSetChanged();
-        emptyMessage.setVisibility(View.VISIBLE);
-        recyclerGroup.setVisibility(View.VISIBLE);
+        databaseReference.child("tasks").addValueEventListener(tasksListener);
     }
 }

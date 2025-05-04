@@ -9,7 +9,8 @@ public class ItemTask {
     private String categoryId;
     private String assignment;
     private String status;
-    private String createdAt; // Thêm trường createdAt để ánh xạ với created_at trên Firebase
+    private String createdAt;
+    private boolean completed; // Thêm trường completed
     private boolean isChecked;
 
     public ItemTask() {
@@ -23,6 +24,7 @@ public class ItemTask {
         this.categoryId = categoryId;
         this.assignment = assignment;
         this.status = status;
+        this.completed = false; // Mặc định chưa hoàn thành
         this.isChecked = false;
     }
 
@@ -98,12 +100,22 @@ public class ItemTask {
         this.createdAt = createdAt;
     }
 
+    public boolean isCompleted() {
+        return completed;
+    }
+
+    public void setCompleted(boolean completed) {
+        this.completed = completed;
+        this.isChecked = completed; // Đồng bộ isChecked với completed
+    }
+
     public boolean isChecked() {
         return isChecked;
     }
 
     public void setChecked(boolean checked) {
         isChecked = checked;
+        this.completed = checked; // Đồng bộ completed với isChecked
     }
 
     public String getContent() {

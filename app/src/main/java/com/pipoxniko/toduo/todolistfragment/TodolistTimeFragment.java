@@ -16,7 +16,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -43,17 +42,34 @@ public class TodolistTimeFragment extends Fragment {
     private ItemTaskGroupAdapter groupAdapter;
     private DatabaseReference databaseReference;
     private String coupleId;
-    private AlertDialog loadingDialog; // Thêm dialog loading
+    private AlertDialog loadingDialog;
+    private ValueEventListener tasksListener;
+
+    public static TodolistTimeFragment newInstance(String coupleId) {
+        TodolistTimeFragment fragment = new TodolistTimeFragment();
+        Bundle args = new Bundle();
+        args.putString("coupleId", coupleId);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            coupleId = getArguments().getString("coupleId");
+        }
+        databaseReference = FirebaseDatabase.getInstance().getReference("TODUO");
+        groupList = new ArrayList<>();
+    }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mView = inflater.inflate(R.layout.fragment_todolist_time, container, false);
 
-        // Gắn RecyclerView
         recyclerGroup = mView.findViewById(R.id.todolist_time_recycler_group);
 
-        // Tạo TextView để hiển thị thông báo "Chưa có công việc nào"
         emptyMessage = new TextView(getContext());
         emptyMessage.setText("Chưa có công việc nào");
         emptyMessage.setTextSize(16);
@@ -67,14 +83,12 @@ public class TodolistTimeFragment extends Fragment {
 
         if (getContext() != null) {
             recyclerGroup.setLayoutManager(new LinearLayoutManager(getContext()));
-            recyclerGroup.setNestedScrollingEnabled(false); // Tắt cuộn của RecyclerView để NestedScrollView xử lý
+            recyclerGroup.setNestedScrollingEnabled(false);
         }
 
-        // Khởi tạo adapter
         groupAdapter = new ItemTaskGroupAdapter(groupList, getContext());
         recyclerGroup.setAdapter(groupAdapter);
 
-        // Khởi tạo dialog loading
         if (getActivity() != null) {
             View loadingView = inflater.inflate(R.layout.custom_loading_dialog, null);
             loadingDialog = new AlertDialog.Builder(getActivity())
@@ -84,53 +98,32 @@ public class TodolistTimeFragment extends Fragment {
             loadingDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         }
 
-        // Khởi tạo Firebase
-        databaseReference = FirebaseDatabase.getInstance().getReference("TODUO");
-        String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-
-        // Lấy coupleId của người dùng
-        databaseReference.child("users").child(currentUserId).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    coupleId = snapshot.child("coupleId").getValue(String.class);
-                    Log.d("TodolistTimeFragment", "CoupleId: " + coupleId);
-                    if (coupleId != null) {
-                        loadTasksFromFirebase();
-                    } else {
-                        if (getActivity() != null) {
-                            Toast.makeText(getActivity(), "Bạn chưa ghép đôi, vui lòng ghép đôi để sử dụng tính năng này", Toast.LENGTH_LONG).show();
-                        }
-                        initializeEmptyGroups();
-                    }
-                } else {
-                    Log.e("TodolistTimeFragment", "Không tìm thấy thông tin người dùng");
-                    if (getActivity() != null) {
-                        Toast.makeText(getActivity(), "Không tìm thấy thông tin người dùng", Toast.LENGTH_LONG).show();
-                    }
-                    initializeEmptyGroups();
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Log.e("TodolistTimeFragment", "Lỗi khi lấy coupleId: " + error.getMessage());
-                if (getActivity() != null) {
-                    Toast.makeText(getActivity(), "Lỗi khi lấy thông tin: " + error.getMessage(), Toast.LENGTH_LONG).show();
-                }
-                initializeEmptyGroups();
-            }
-        });
+        if (coupleId == null) {
+            Toast.makeText(getActivity(), "Bạn chưa ghép đôi, hiển thị danh sách mặc định", Toast.LENGTH_LONG).show();
+            initializeEmptyGroups();
+        } else {
+            loadTasksFromFirebase();
+        }
 
         return mView;
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        if (coupleId != null) {
+            loadTasksFromFirebase();
+        }
+    }
+
+    @Override
     public void onDestroyView() {
         super.onDestroyView();
-        // Đóng dialog loading nếu đang hiển thị
         if (loadingDialog != null && loadingDialog.isShowing()) {
             loadingDialog.dismiss();
+        }
+        if (tasksListener != null) {
+            databaseReference.child("tasks").removeEventListener(tasksListener);
         }
         loadingDialog = null;
     }
@@ -152,7 +145,11 @@ public class TodolistTimeFragment extends Fragment {
             loadingDialog.show();
         }
 
-        databaseReference.child("tasks").addListenerForSingleValueEvent(new ValueEventListener() {
+        if (tasksListener != null) {
+            databaseReference.child("tasks").removeEventListener(tasksListener);
+        }
+
+        tasksListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (loadingDialog != null && loadingDialog.isShowing()) {
@@ -203,11 +200,11 @@ public class TodolistTimeFragment extends Fragment {
                     String taskCoupleId = taskSnapshot.child("couple_id").getValue(String.class);
                     String title = taskSnapshot.child("title").getValue(String.class);
                     String deadline = taskSnapshot.child("deadline").getValue(String.class);
+                    Boolean completed = taskSnapshot.child("completed").getValue(Boolean.class);
                     String status = taskSnapshot.child("status").getValue(String.class);
                     String createdAt = taskSnapshot.child("created_at").getValue(String.class);
 
-                    if (taskId != null && taskCoupleId != null && coupleId.equals(taskCoupleId)) {
-                        // Chỉ xử lý task có trạng thái "normal" hoặc "completed"
+                    if (taskId != null && taskCoupleId != null && coupleId != null && coupleId.equals(taskCoupleId)) {
                         if (status == null || (!status.equals("normal") && !status.equals("completed"))) {
                             Log.d("TodolistTimeFragment", "Bỏ qua task " + taskId + " do trạng thái không phù hợp: " + status);
                             continue;
@@ -218,11 +215,13 @@ public class TodolistTimeFragment extends Fragment {
                         task.setCoupleId(taskCoupleId);
                         task.setTitle(title != null ? title : "Không có tiêu đề");
                         task.setDeadline(deadline);
+                        task.setCompleted(completed != null ? completed : false);
                         task.setStatus(status != null ? status : "normal");
                         task.setCreatedAt(createdAt);
+                        task.setChecked(task.isCompleted());
 
                         taskCount++;
-                        Log.d("TodolistTimeFragment", "Task found: " + task.getTitle() + ", Deadline: " + task.getDeadline());
+                        Log.d("TodolistTimeFragment", "Task found: " + task.getTitle() + ", Deadline: " + task.getDeadline() + ", Completed: " + task.isCompleted());
 
                         if (task.getDeadline() == null) {
                             futureTasks.add(task);
@@ -297,6 +296,8 @@ public class TodolistTimeFragment extends Fragment {
                 }
                 initializeEmptyGroups();
             }
-        });
+        };
+
+        databaseReference.child("tasks").addValueEventListener(tasksListener);
     }
 }

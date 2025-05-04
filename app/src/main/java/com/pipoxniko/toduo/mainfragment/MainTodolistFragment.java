@@ -79,21 +79,73 @@ public class MainTodolistFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mView = inflater.inflate(R.layout.fragment_main_todolist, container, false);
 
-        // Ánh xạ view (giữ nguyên từ code cũ)
+        // Ánh xạ view
         viewPager2 = mView.findViewById(R.id.tab_view_pager);
         tabTime = mView.findViewById(R.id.todolist_tab_time);
         tabCategory = mView.findViewById(R.id.todolist_tab_category);
         tabAssign = mView.findViewById(R.id.todolist_tab_assign);
         tabStatus = mView.findViewById(R.id.todolist_tab_status);
 
-        // Mặc định sẽ là tab Thời gian (giữ nguyên từ code cũ)
+        // Mặc định sẽ là tab Thời gian
         setTabSelected("time");
 
-        // Set adapter cho ViewPager2 (giữ nguyên từ code cũ)
-        TodolistViewPagerAdapter adapter = new TodolistViewPagerAdapter(getActivity());
+        // Khởi tạo Firebase
+        auth = FirebaseAuth.getInstance();
+        databaseReference = FirebaseDatabase.getInstance().getReference("TODUO");
+        currentUserId = auth.getCurrentUser().getUid();
+
+        // Ánh xạ nút thêm task
+        addTaskButton = mView.findViewById(R.id.todolist_btn_add_task);
+
+        // Lấy coupleId của người dùng trước khi khởi tạo ViewPager
+        databaseReference.child("users").child(currentUserId).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    coupleId = snapshot.child("coupleId").getValue(String.class);
+                    if (coupleId == null) {
+                        if (getActivity() != null) {
+                            Toast.makeText(getActivity(), "Bạn chưa ghép đôi, vui lòng ghép đôi để sử dụng tính năng này", Toast.LENGTH_LONG).show();
+                        }
+                        // Hiển thị ViewPager với coupleId là null (sẽ hiển thị danh sách mặc định)
+                        setupViewPager();
+                    } else {
+                        // Kiểm tra và thêm các phân loại mặc định
+                        addDefaultCategories();
+                        // Khởi tạo ViewPager sau khi có coupleId
+                        setupViewPager();
+                    }
+                } else {
+                    if (getActivity() != null) {
+                        Toast.makeText(getActivity(), "Không tìm thấy thông tin người dùng", Toast.LENGTH_LONG).show();
+                    }
+                    // Hiển thị ViewPager với coupleId là null (sẽ hiển thị danh sách mặc định)
+                    setupViewPager();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                if (getActivity() != null) {
+                    Toast.makeText(getActivity(), "Lỗi khi lấy thông tin: " + error.getMessage(), Toast.LENGTH_LONG).show();
+                }
+                // Hiển thị ViewPager với coupleId là null (sẽ hiển thị danh sách mặc định)
+                setupViewPager();
+            }
+        });
+
+        // Sự kiện nhấn nút "Thêm task"
+        addTaskButton.setOnClickListener(v -> showAddTaskDialog());
+
+        return mView;
+    }
+
+    private void setupViewPager() {
+        // Set adapter cho ViewPager2
+        TodolistViewPagerAdapter adapter = new TodolistViewPagerAdapter(getActivity(), coupleId);
         viewPager2.setAdapter(adapter);
 
-        // Xử lý sự kiện khi click vào các tab (giữ nguyên từ code cũ)
+        // Xử lý sự kiện khi click vào các tab
         tabTime.setOnClickListener(v -> {
             setTabSelected("time");
             viewPager2.setCurrentItem(0, true);
@@ -110,50 +162,13 @@ public class MainTodolistFragment extends Fragment {
             setTabSelected("status");
             viewPager2.setCurrentItem(3, true);
         });
-
-        // --- Logic xử lý thêm task ---
-
-        // Khởi tạo Firebase
-        auth = FirebaseAuth.getInstance();
-        databaseReference = FirebaseDatabase.getInstance().getReference("TODUO");
-        currentUserId = auth.getCurrentUser().getUid();
-
-        // Ánh xạ nút thêm task
-        addTaskButton = mView.findViewById(R.id.todolist_btn_add_task);
-
-        // Lấy coupleId của người dùng
-        databaseReference.child("users").child(currentUserId).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    coupleId = snapshot.child("coupleId").getValue(String.class);
-                    if (coupleId == null) {
-                        if (getActivity() != null) {
-                            Toast.makeText(getActivity(), "Bạn chưa ghép đôi, vui lòng ghép đôi để sử dụng tính năng này", Toast.LENGTH_LONG).show();
-                        }
-                    } else {
-                        // Kiểm tra và thêm các phân loại mặc định
-                        addDefaultCategories();
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                if (getActivity() != null) {
-                    Toast.makeText(getActivity(), "Lỗi khi lấy thông tin: " + error.getMessage(), Toast.LENGTH_LONG).show();
-                }
-            }
-        });
-
-        // Sự kiện nhấn nút "Thêm task"
-        addTaskButton.setOnClickListener(v -> showAddTaskDialog());
-
-        return mView;
     }
 
     private void showAddTaskDialog() {
-        if (getActivity() == null || coupleId == null) return;
+        if (getActivity() == null || coupleId == null) {
+            Toast.makeText(getActivity(), "Bạn chưa ghép đôi, vui lòng ghép đôi để sử dụng tính năng này", Toast.LENGTH_LONG).show();
+            return;
+        }
 
         View dialogView = LayoutInflater.from(getActivity()).inflate(R.layout.todolist_dialog_add_task, null);
         EditText titleEditText = dialogView.findViewById(R.id.todolist_add_task_title);
@@ -167,27 +182,19 @@ public class MainTodolistFragment extends Fragment {
                 .setView(dialogView)
                 .create();
 
-        // Thiết lập nền trong suốt và hiển thị ở dưới cùng
         addTaskDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         addTaskDialog.getWindow().setGravity(Gravity.BOTTOM);
         addTaskDialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 
-        // Ẩn bàn phím khi chạm ra ngoài EditText
         dialogView.setOnTouchListener((v, event) -> {
             hideKeyboard(v);
             return false;
         });
 
-        // Sự kiện nhấn icon phân loại
         categoryIcon.setOnClickListener(v -> showCategoryDialog(categoryIcon));
-
-        // Sự kiện nhấn icon phân công
         assignmentIcon.setOnClickListener(v -> showAssignmentDialog(assignmentIcon));
-
-        // Sự kiện nhấn icon lịch
         deadlineIcon.setOnClickListener(v -> showDeadlineDialog());
 
-        // Sự kiện nhấn nút "Lưu"
         saveButton.setOnClickListener(v -> {
             String title = titleEditText.getText().toString().trim();
             String description = descriptionEditText.getText().toString().trim();
@@ -213,7 +220,6 @@ public class MainTodolistFragment extends Fragment {
                 .setView(dialogView)
                 .create();
 
-        // Ánh xạ các view trong dialog
         Switch switchSelectDate = dialogView.findViewById(R.id.todolist_set_deadline_switch_select_date);
         LinearLayout datePickerContainer = dialogView.findViewById(R.id.todolist_set_deadline_date_picker_container);
         Button btnSelectDate = dialogView.findViewById(R.id.todolist_set_deadline_btn_select_date);
@@ -227,7 +233,6 @@ public class MainTodolistFragment extends Fragment {
         Button btnCancel = dialogView.findViewById(R.id.todolist_set_deadline_btn_cancel);
         Button btnConfirm = dialogView.findViewById(R.id.todolist_set_deadline_btn_confirm);
 
-        // Khởi tạo giá trị ban đầu
         if (selectedDate != null) {
             switchSelectDate.setChecked(true);
             datePickerContainer.setVisibility(View.VISIBLE);
@@ -239,29 +244,26 @@ public class MainTodolistFragment extends Fragment {
             tvSelectedTime.setText(selectedTime);
         }
 
-        // Xử lý Switch chọn ngày
         switchSelectDate.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
                 datePickerContainer.setVisibility(View.VISIBLE);
             } else {
                 datePickerContainer.setVisibility(View.GONE);
                 tvSelectedDate.setText("Chưa chọn");
-                selectedDate = null; // Reset ngày khi tắt switch
+                selectedDate = null;
             }
         });
 
-        // Xử lý Switch chọn giờ
         switchSelectTime.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
                 timePickerContainer.setVisibility(View.VISIBLE);
             } else {
                 timePickerContainer.setVisibility(View.GONE);
                 tvSelectedTime.setText("Chưa chọn");
-                selectedTime = null; // Reset giờ khi tắt switch
+                selectedTime = null;
             }
         });
 
-        // Xử lý nút chọn ngày
         btnSelectDate.setOnClickListener(v -> {
             Calendar calendar = Calendar.getInstance();
             int year = calendar.get(Calendar.YEAR);
@@ -276,7 +278,6 @@ public class MainTodolistFragment extends Fragment {
             datePickerDialog.show();
         });
 
-        // Xử lý nút chọn giờ
         btnSelectTime.setOnClickListener(v -> {
             Calendar calendar = Calendar.getInstance();
             int hour = calendar.get(Calendar.HOUR_OF_DAY);
@@ -290,13 +291,9 @@ public class MainTodolistFragment extends Fragment {
             timePickerDialog.show();
         });
 
-        // Xử lý nút Hủy
         btnCancel.setOnClickListener(v -> deadlineDialog.dismiss());
 
-        // Xử lý nút Xác nhận
-        btnConfirm.setOnClickListener(v -> {
-            deadlineDialog.dismiss();
-        });
+        btnConfirm.setOnClickListener(v -> deadlineDialog.dismiss());
 
         deadlineDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         deadlineDialog.show();
@@ -305,23 +302,19 @@ public class MainTodolistFragment extends Fragment {
     private void showCategoryDialog(View anchorView) {
         if (getActivity() == null) return;
 
-        // Inflate layout cho dialog phân loại
         View dialogView = LayoutInflater.from(getActivity()).inflate(R.layout.todolist_dialog_select_category, null);
         RecyclerView categoryList = dialogView.findViewById(R.id.todolist_category_list);
 
-        // Khởi tạo PopupWindow
         categoryPopupWindow = new PopupWindow(dialogView,
                 ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT,
                 true);
 
-        // Thiết lập nền và hiệu ứng
         categoryPopupWindow.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         categoryPopupWindow.setElevation(8f);
         categoryPopupWindow.setOutsideTouchable(true);
         categoryPopupWindow.setTouchable(true);
 
-        // Lấy danh sách phân loại từ Firebase
         categoryList.setLayoutManager(new LinearLayoutManager(getActivity()));
         List<ItemCategory> categories = new ArrayList<>();
 
@@ -343,24 +336,20 @@ public class MainTodolistFragment extends Fragment {
                     selectedCategory = category;
                     categoryPopupWindow.dismiss();
                 });
-                adapter.setSelectedCategory(selectedCategory); // Truyền giá trị đã chọn vào adapter
+                adapter.setSelectedCategory(selectedCategory);
                 categoryList.setAdapter(adapter);
 
-                // Đo kích thước của dialogView sau khi đã set adapter
                 dialogView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
                 int popupHeight = dialogView.getMeasuredHeight();
 
-                // Lấy vị trí của anchorView trên màn hình
                 int[] location = new int[2];
                 anchorView.getLocationOnScreen(location);
                 int anchorX = location[0];
                 int anchorY = location[1];
 
-                // Tính toán vị trí để hiển thị popup phía trên anchorView
                 int offsetX = anchorView.getWidth();
                 int offsetY = -popupHeight - anchorView.getHeight();
 
-                // Hiển thị PopupWindow phía trên anchorView
                 categoryPopupWindow.showAtLocation(anchorView, Gravity.NO_GRAVITY, anchorX + offsetX, anchorY + offsetY);
             }
 
@@ -374,34 +363,28 @@ public class MainTodolistFragment extends Fragment {
     private void showAssignmentDialog(View anchorView) {
         if (getActivity() == null) return;
 
-        // Inflate layout cho dialog phân công
         View dialogView = LayoutInflater.from(getActivity()).inflate(R.layout.todolist_dialog_select_assignment, null);
         RecyclerView assignmentList = dialogView.findViewById(R.id.assignment_list);
 
-        // Khởi tạo PopupWindow
         assignmentPopupWindow = new PopupWindow(dialogView,
                 ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT,
                 true);
 
-        // Thiết lập nền và hiệu ứng
         assignmentPopupWindow.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         assignmentPopupWindow.setElevation(8f);
         assignmentPopupWindow.setOutsideTouchable(true);
         assignmentPopupWindow.setTouchable(true);
 
-        // Thiết lập danh sách phân công
         assignmentList.setLayoutManager(new LinearLayoutManager(getActivity()));
         List<String> assignments = new ArrayList<>();
 
-        // Lấy tên người dùng từ Firebase
         databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 String user1Name = "User 1";
                 String user2Name = "User 2";
 
-                // Lấy tên người dùng 1 (current user)
                 DataSnapshot currentUserSnapshot = snapshot.child(currentUserId);
                 if (currentUserSnapshot.exists()) {
                     user1Name = currentUserSnapshot.child("nickname").getValue(String.class);
@@ -412,14 +395,13 @@ public class MainTodolistFragment extends Fragment {
                     Toast.makeText(getActivity(), "Không tìm thấy thông tin người dùng hiện tại", Toast.LENGTH_LONG).show();
                 }
 
-                // Lấy coupleId để tìm người dùng 2
                 if (coupleId != null) {
                     boolean foundPartner = false;
                     for (DataSnapshot userSnapshot : snapshot.getChildren()) {
                         String userId = userSnapshot.getKey();
                         String userCoupleId = userSnapshot.child("coupleId").getValue(String.class);
                         if (userId != null && !userId.equals(currentUserId) && coupleId.equals(userCoupleId)) {
-                            user2Name = userSnapshot.child("nickname").getValue(String.class); // Sửa "name" thành "nickName"
+                            user2Name = userSnapshot.child("nickname").getValue(String.class);
                             if (user2Name == null || user2Name.isEmpty()) {
                                 user2Name = "User 2";
                             }
@@ -445,21 +427,17 @@ public class MainTodolistFragment extends Fragment {
                 adapter.setSelectedAssignment(selectedAssignment);
                 assignmentList.setAdapter(adapter);
 
-                // Đo kích thước của dialogView sau khi đã set adapter
                 dialogView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
                 int popupHeight = dialogView.getMeasuredHeight();
 
-                // Lấy vị trí của anchorView trên màn hình
                 int[] location = new int[2];
                 anchorView.getLocationOnScreen(location);
                 int anchorX = location[0];
                 int anchorY = location[1];
 
-                // Tính toán vị trí để hiển thị popup phía trên anchorView
                 int offsetX = anchorView.getWidth();
                 int offsetY = -popupHeight - anchorView.getHeight();
 
-                // Hiển thị PopupWindow phía trên anchorView
                 assignmentPopupWindow.showAtLocation(anchorView, Gravity.NO_GRAVITY, anchorX + offsetX, anchorY + offsetY);
             }
 
@@ -483,38 +461,33 @@ public class MainTodolistFragment extends Fragment {
         task.put("title", title);
         task.put("description", description);
 
-        // Xử lý deadline
         String deadline = null;
         if (selectedDate != null) {
             try {
-                // Nếu có ngày, chuyển đổi định dạng và thêm giờ
                 SimpleDateFormat inputDateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
                 Date date = inputDateFormat.parse(selectedDate);
 
-                // Nếu không chọn giờ, mặc định là 07:00
                 String time = (selectedTime != null) ? selectedTime : "07:00";
                 SimpleDateFormat inputTimeFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
                 Date fullDateTime = inputTimeFormat.parse(selectedDate + " " + time);
 
-                // Định dạng deadline thành "yyyy-MM-dd HH:mm"
                 SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
                 deadline = outputFormat.format(fullDateTime);
             } catch (Exception e) {
                 Toast.makeText(getActivity(), "Lỗi khi xử lý thời gian: " + e.getMessage(), Toast.LENGTH_LONG).show();
             }
         }
-        task.put("deadline", deadline); // Nếu không chọn ngày, deadline sẽ là null
+        task.put("deadline", deadline);
 
         task.put("category_id", selectedCategory != null ? selectedCategory.getId() : null);
         task.put("assignment", selectedAssignment != null ? selectedAssignment : "Cả hai");
-        task.put("completed", "false");
+        task.put("completed", false);
         task.put("status", "normal");
         task.put("created_at", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date()));
 
         databaseReference.child("tasks").child(taskId).setValue(task)
                 .addOnSuccessListener(aVoid -> {
                     Toast.makeText(getActivity(), "Thêm task thành công", Toast.LENGTH_SHORT).show();
-                    // Reset các giá trị sau khi lưu
                     selectedCategory = null;
                     selectedAssignment = null;
                     selectedDate = null;
@@ -524,7 +497,6 @@ public class MainTodolistFragment extends Fragment {
     }
 
     private void addDefaultCategories() {
-        // Danh sách các phân loại mặc định
         List<String> defaultCategories = Arrays.asList(
                 "Tài chính",
                 "Giải trí",
@@ -534,7 +506,6 @@ public class MainTodolistFragment extends Fragment {
                 "Du lịch"
         );
 
-        // Kiểm tra xem đã có phân loại nào cho coupleId này chưa
         databaseReference.child("task_categories").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -547,7 +518,6 @@ public class MainTodolistFragment extends Fragment {
                     }
                 }
 
-                // Nếu chưa có phân loại nào cho coupleId này, thêm các phân loại mặc định
                 if (!hasCategoriesForCouple) {
                     for (String categoryName : defaultCategories) {
                         String categoryId = databaseReference.child("task_categories").push().getKey();
