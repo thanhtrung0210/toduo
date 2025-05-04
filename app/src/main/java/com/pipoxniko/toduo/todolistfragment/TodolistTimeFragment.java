@@ -148,7 +148,6 @@ public class TodolistTimeFragment extends Fragment {
     }
 
     private void loadTasksFromFirebase() {
-        // Hiển thị dialog loading
         if (loadingDialog != null) {
             loadingDialog.show();
         }
@@ -156,7 +155,6 @@ public class TodolistTimeFragment extends Fragment {
         databaseReference.child("tasks").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                // Ẩn dialog loading
                 if (loadingDialog != null && loadingDialog.isShowing()) {
                     loadingDialog.dismiss();
                 }
@@ -174,7 +172,6 @@ public class TodolistTimeFragment extends Fragment {
                 todayCal.set(Calendar.SECOND, 0);
                 todayCal.set(Calendar.MILLISECOND, 0);
 
-                // Cuối ngày hôm nay
                 Calendar endOfTodayCal = Calendar.getInstance();
                 endOfTodayCal.setTime(todayCal.getTime());
                 endOfTodayCal.set(Calendar.HOUR_OF_DAY, 23);
@@ -182,7 +179,6 @@ public class TodolistTimeFragment extends Fragment {
                 endOfTodayCal.set(Calendar.SECOND, 59);
                 endOfTodayCal.set(Calendar.MILLISECOND, 999);
 
-                // Cuối tuần này
                 Calendar endOfThisWeekCal = Calendar.getInstance();
                 endOfThisWeekCal.setTime(todayCal.getTime());
                 endOfThisWeekCal.set(Calendar.DAY_OF_WEEK, endOfThisWeekCal.getFirstDayOfWeek());
@@ -193,7 +189,6 @@ public class TodolistTimeFragment extends Fragment {
                 endOfThisWeekCal.set(Calendar.SECOND, 59);
                 endOfThisWeekCal.set(Calendar.MILLISECOND, 999);
 
-                // Cuối tháng này
                 Calendar endOfThisMonthCal = Calendar.getInstance();
                 endOfThisMonthCal.set(Calendar.DAY_OF_MONTH, endOfThisMonthCal.getActualMaximum(Calendar.DAY_OF_MONTH));
                 endOfThisMonthCal.set(Calendar.HOUR_OF_DAY, 23);
@@ -211,8 +206,13 @@ public class TodolistTimeFragment extends Fragment {
                     String status = taskSnapshot.child("status").getValue(String.class);
                     String createdAt = taskSnapshot.child("created_at").getValue(String.class);
 
-                    // Kiểm tra dữ liệu trước khi tạo đối tượng ItemTask
                     if (taskId != null && taskCoupleId != null && coupleId.equals(taskCoupleId)) {
+                        // Chỉ xử lý task có trạng thái "normal" hoặc "completed"
+                        if (status == null || (!status.equals("normal") && !status.equals("completed"))) {
+                            Log.d("TodolistTimeFragment", "Bỏ qua task " + taskId + " do trạng thái không phù hợp: " + status);
+                            continue;
+                        }
+
                         ItemTask task = new ItemTask();
                         task.setId(taskId);
                         task.setCoupleId(taskCoupleId);
@@ -224,7 +224,6 @@ public class TodolistTimeFragment extends Fragment {
                         taskCount++;
                         Log.d("TodolistTimeFragment", "Task found: " + task.getTitle() + ", Deadline: " + task.getDeadline());
 
-                        // Nếu task không có deadline, đưa vào nhóm "Tương lai"
                         if (task.getDeadline() == null) {
                             futureTasks.add(task);
                             Log.d("TodolistTimeFragment", "Added to Tương lai (no deadline): " + task.getTitle());
@@ -236,34 +235,25 @@ public class TodolistTimeFragment extends Fragment {
                             Calendar deadlineCal = Calendar.getInstance();
                             deadlineCal.setTime(deadlineDate);
 
-                            // Task đã qua (deadline trước ngày hiện tại)
                             if (deadlineCal.getTimeInMillis() < todayCal.getTimeInMillis()) {
                                 pastTasks.add(task);
                                 Log.d("TodolistTimeFragment", "Added to Đã qua: " + task.getTitle());
-                            }
-                            // Task hôm nay (deadline trong ngày hiện tại)
-                            else if (deadlineCal.getTimeInMillis() <= endOfTodayCal.getTimeInMillis()) {
+                            } else if (deadlineCal.getTimeInMillis() <= endOfTodayCal.getTimeInMillis()) {
                                 todayTasks.add(task);
                                 Log.d("TodolistTimeFragment", "Added to Hôm nay: " + task.getTitle());
-                            }
-                            // Task tuần này (deadline từ sau hôm nay đến cuối tuần này)
-                            else if (deadlineCal.getTimeInMillis() <= endOfThisWeekCal.getTimeInMillis()) {
+                            } else if (deadlineCal.getTimeInMillis() <= endOfThisWeekCal.getTimeInMillis()) {
                                 thisWeekTasks.add(task);
                                 Log.d("TodolistTimeFragment", "Added to Tuần này: " + task.getTitle());
-                            }
-                            // Task tháng này (deadline từ sau tuần này đến cuối tháng này)
-                            else if (deadlineCal.getTimeInMillis() <= endOfThisMonthCal.getTimeInMillis()) {
+                            } else if (deadlineCal.getTimeInMillis() <= endOfThisMonthCal.getTimeInMillis()) {
                                 thisMonthTasks.add(task);
                                 Log.d("TodolistTimeFragment", "Added to Tháng này: " + task.getTitle());
-                            }
-                            // Task tương lai (deadline ngoài tháng này)
-                            else {
+                            } else {
                                 futureTasks.add(task);
                                 Log.d("TodolistTimeFragment", "Added to Tương lai: " + task.getTitle());
                             }
                         } catch (Exception e) {
                             Log.e("TodolistTimeFragment", "Lỗi khi phân tích deadline của task: " + task.getTitle(), e);
-                            futureTasks.add(task); // Nếu lỗi phân tích, đưa vào nhóm "Tương lai"
+                            futureTasks.add(task);
                             Log.d("TodolistTimeFragment", "Added to Tương lai (parse error): " + task.getTitle());
                         }
                     } else {
@@ -278,7 +268,6 @@ public class TodolistTimeFragment extends Fragment {
                 Log.d("TodolistTimeFragment", "Tương lai: " + futureTasks.size() + " tasks");
                 Log.d("TodolistTimeFragment", "Đã qua: " + pastTasks.size() + " tasks");
 
-                // Luôn hiển thị 5 nhóm, kể cả khi không có task con
                 groupList.clear();
                 groupList.add(new ItemTaskGroup("Hôm nay", todayTasks));
                 groupList.add(new ItemTaskGroup("Tuần này", thisWeekTasks));
@@ -288,7 +277,6 @@ public class TodolistTimeFragment extends Fragment {
 
                 groupAdapter.notifyDataSetChanged();
 
-                // Hiển thị thông báo nếu không có task nào
                 if (taskCount == 0) {
                     emptyMessage.setVisibility(View.VISIBLE);
                     recyclerGroup.setVisibility(View.VISIBLE);
@@ -300,7 +288,6 @@ public class TodolistTimeFragment extends Fragment {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                // Ẩn dialog loading nếu có lỗi
                 if (loadingDialog != null && loadingDialog.isShowing()) {
                     loadingDialog.dismiss();
                 }

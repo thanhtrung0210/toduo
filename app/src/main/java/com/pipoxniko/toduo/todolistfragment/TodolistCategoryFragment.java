@@ -141,16 +141,14 @@ public class TodolistCategoryFragment extends Fragment {
     }
 
     private void loadCategoriesAndTasks() {
-        // Hiển thị dialog loading
         if (loadingDialog != null) {
             loadingDialog.show();
         }
 
-        // Bước 1: Lấy danh sách các phân loại từ task_categories
         databaseReference.child("task_categories").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                Map<String, String> categoryMap = new HashMap<>(); // categoryId -> categoryName
+                Map<String, String> categoryMap = new HashMap<>();
                 for (DataSnapshot categorySnapshot : snapshot.getChildren()) {
                     String categoryId = categorySnapshot.getKey();
                     String categoryCoupleId = categorySnapshot.child("couple_id").getValue(String.class);
@@ -173,16 +171,14 @@ public class TodolistCategoryFragment extends Fragment {
                     return;
                 }
 
-                // Bước 2: Lấy danh sách task và nhóm theo phân loại
                 databaseReference.child("tasks").addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        // Ẩn dialog loading
                         if (loadingDialog != null && loadingDialog.isShowing()) {
                             loadingDialog.dismiss();
                         }
 
-                        Map<String, List<ItemTask>> tasksByCategory = new HashMap<>(); // categoryId -> List<ItemTask>
+                        Map<String, List<ItemTask>> tasksByCategory = new HashMap<>();
                         int taskCount = 0;
 
                         for (DataSnapshot taskSnapshot : snapshot.getChildren()) {
@@ -195,6 +191,12 @@ public class TodolistCategoryFragment extends Fragment {
                             String createdAt = taskSnapshot.child("created_at").getValue(String.class);
 
                             if (taskId != null && taskCoupleId != null && coupleId.equals(taskCoupleId)) {
+                                // Chỉ xử lý task có trạng thái "normal" hoặc "completed"
+                                if (status == null || (!status.equals("normal") && !status.equals("completed"))) {
+                                    Log.d("TodolistCategoryFragment", "Bỏ qua task " + taskId + " do trạng thái không phù hợp: " + status);
+                                    continue;
+                                }
+
                                 ItemTask task = new ItemTask();
                                 task.setId(taskId);
                                 task.setCoupleId(taskCoupleId);
@@ -219,19 +221,17 @@ public class TodolistCategoryFragment extends Fragment {
 
                         Log.d("TodolistCategoryFragment", "Tổng số task tìm thấy: " + taskCount);
 
-                        // Bước 3: Tạo các nhóm task theo phân loại (hiển thị tất cả phân loại, kể cả không có task)
                         groupList.clear();
                         for (Map.Entry<String, String> entry : categoryMap.entrySet()) {
                             String categoryId = entry.getKey();
                             String categoryName = entry.getValue();
                             List<ItemTask> tasks = tasksByCategory.getOrDefault(categoryId, new ArrayList<>());
-                            groupList.add(new ItemTaskGroup(categoryName, tasks)); // Hiển thị tất cả phân loại
+                            groupList.add(new ItemTaskGroup(categoryName, tasks));
                             Log.d("TodolistCategoryFragment", "Group created: " + categoryName + ", Task count: " + tasks.size());
                         }
 
                         groupAdapter.notifyDataSetChanged();
 
-                        // Hiển thị thông báo nếu không có task nào
                         if (taskCount == 0) {
                             emptyMessage.setVisibility(View.VISIBLE);
                             recyclerGroup.setVisibility(View.VISIBLE);
@@ -243,7 +243,6 @@ public class TodolistCategoryFragment extends Fragment {
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
-                        // Ẩn dialog loading nếu có lỗi
                         if (loadingDialog != null && loadingDialog.isShowing()) {
                             loadingDialog.dismiss();
                         }
@@ -258,7 +257,6 @@ public class TodolistCategoryFragment extends Fragment {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                // Ẩn dialog loading nếu có lỗi
                 if (loadingDialog != null && loadingDialog.isShowing()) {
                     loadingDialog.dismiss();
                 }

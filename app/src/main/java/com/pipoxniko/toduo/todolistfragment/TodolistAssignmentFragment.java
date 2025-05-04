@@ -202,7 +202,6 @@ public class TodolistAssignmentFragment extends Fragment {
     }
 
     private void loadTasksFromFirebase() {
-        // Hiển thị dialog loading
         if (loadingDialog != null) {
             loadingDialog.show();
         }
@@ -210,7 +209,6 @@ public class TodolistAssignmentFragment extends Fragment {
         databaseReference.child("tasks").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                // Ẩn dialog loading
                 if (loadingDialog != null && loadingDialog.isShowing()) {
                     loadingDialog.dismiss();
                 }
@@ -230,6 +228,12 @@ public class TodolistAssignmentFragment extends Fragment {
                     String createdAt = taskSnapshot.child("created_at").getValue(String.class);
 
                     if (taskId != null && taskCoupleId != null && coupleId.equals(taskCoupleId)) {
+                        // Chỉ xử lý task có trạng thái "normal" hoặc "completed"
+                        if (status == null || (!status.equals("normal") && !status.equals("completed"))) {
+                            Log.d("TodolistAssignmentFragment", "Bỏ qua task " + taskId + " do trạng thái không phù hợp: " + status);
+                            continue;
+                        }
+
                         ItemTask task = new ItemTask();
                         task.setId(taskId);
                         task.setCoupleId(taskCoupleId);
@@ -263,7 +267,6 @@ public class TodolistAssignmentFragment extends Fragment {
 
                 Log.d("TodolistAssignmentFragment", "Tổng số task tìm thấy: " + taskCount);
 
-                // Luôn hiển thị 3 nhóm, kể cả khi không có task con
                 groupList.clear();
                 groupList.add(new ItemTaskGroup(user1Nickname, user1Tasks));
                 groupList.add(new ItemTaskGroup(user2Nickname, user2Tasks));
@@ -271,7 +274,6 @@ public class TodolistAssignmentFragment extends Fragment {
 
                 groupAdapter.notifyDataSetChanged();
 
-                // Hiển thị thông báo nếu không có task nào
                 if (taskCount == 0) {
                     emptyMessage.setVisibility(View.VISIBLE);
                     recyclerGroup.setVisibility(View.VISIBLE);
@@ -283,7 +285,6 @@ public class TodolistAssignmentFragment extends Fragment {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                // Ẩn dialog loading nếu có lỗi
                 if (loadingDialog != null && loadingDialog.isShowing()) {
                     loadingDialog.dismiss();
                 }

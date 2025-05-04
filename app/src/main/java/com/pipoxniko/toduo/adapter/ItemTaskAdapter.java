@@ -100,20 +100,42 @@ public class ItemTaskAdapter extends RecyclerView.Adapter<ItemTaskAdapter.TaskVi
     @Override
     public void onBindViewHolder(@NonNull TaskViewHolder holder, int position) {
         ItemTask task = taskList.get(position);
-        holder.checkBox.setOnCheckedChangeListener(null);
+        holder.checkBox.setOnCheckedChangeListener(null); // Ngăn listener cũ gây lỗi
         holder.checkBox.setChecked(task.isChecked());
         holder.taskText.setText(task.getContent());
         holder.checkBox.setButtonTintList(null);
 
         applyStrikeThrough(holder.taskText, task.isChecked());
 
+        // Đồng bộ checkbox với trạng thái từ Firebase
+        if (task.getStatus() != null) {
+            boolean isCompleted = task.getStatus().equals("completed");
+            holder.checkBox.setChecked(isCompleted);
+            task.setChecked(isCompleted);
+            applyStrikeThrough(holder.taskText, isCompleted);
+        }
+
+        // Xử lý click checkbox
         holder.checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
             task.setChecked(isChecked);
             applyStrikeThrough(holder.taskText, isChecked);
 
-            Map<String, Object> updates = new HashMap<>();
-            updates.put("status", task.getStatus());
-            databaseReference.child(task.getId()).updateChildren(updates);
+            // Cập nhật trạng thái trên Firebase
+            String newStatus = isChecked ? "completed" : "normal";
+            task.setStatus(newStatus); // Cập nhật trạng thái trong đối tượng task
+            databaseReference.child(task.getId()).child("status").setValue(newStatus)
+                    .addOnSuccessListener(aVoid -> {
+                        Toast.makeText(context, "Cập nhật trạng thái thành công: " + (isChecked ? "Đã hoàn thành" : "Bình thường"), Toast.LENGTH_SHORT).show();
+                        android.util.Log.d("ItemTaskAdapter", "Cập nhật trạng thái task " + task.getTitle() + " thành: " + newStatus);
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(context, "Lỗi khi cập nhật trạng thái: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                        android.util.Log.e("ItemTaskAdapter", "Lỗi khi cập nhật trạng thái task " + task.getTitle() + ": " + e.getMessage());
+                        // Hoàn tác nếu có lỗi
+                        holder.checkBox.setChecked(!isChecked);
+                        task.setChecked(!isChecked);
+                        applyStrikeThrough(holder.taskText, !isChecked);
+                    });
         });
 
         // Xử lý nút ba chấm
@@ -354,8 +376,20 @@ public class ItemTaskAdapter extends RecyclerView.Adapter<ItemTaskAdapter.TaskVi
                 pendingTask.put("requested_at", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date()));
 
                 pendingTasksReference.child(pendingTaskId).setValue(pendingTask)
-                        .addOnSuccessListener(aVoid -> Toast.makeText(context, "Yêu cầu chỉnh sửa đã được gửi", Toast.LENGTH_SHORT).show())
-                        .addOnFailureListener(e -> Toast.makeText(context, "Lỗi khi gửi yêu cầu chỉnh sửa: " + e.getMessage(), Toast.LENGTH_LONG).show());
+                        .addOnSuccessListener(aVoid -> {
+                            Toast.makeText(context, "Yêu cầu chỉnh sửa đã được gửi", Toast.LENGTH_SHORT).show();
+                            // Cập nhật trạng thái trên bảng tasks
+                            databaseReference.child(task.getId()).child("status").setValue("pending_edit")
+                                    .addOnSuccessListener(aVoid2 -> {
+                                        android.util.Log.d("ItemTaskAdapter", "Task " + task.getTitle() + " đã chuyển sang trạng thái pending_edit");
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        android.util.Log.e("ItemTaskAdapter", "Lỗi khi cập nhật trạng thái pending_edit cho task " + task.getTitle() + ": " + e.getMessage());
+                                    });
+                        })
+                        .addOnFailureListener(e -> {
+                            Toast.makeText(context, "Lỗi khi gửi yêu cầu chỉnh sửa: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                        });
             }
 
             dialog.dismiss();
@@ -605,8 +639,20 @@ public class ItemTaskAdapter extends RecyclerView.Adapter<ItemTaskAdapter.TaskVi
                 pendingTask.put("requested_at", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date()));
 
                 pendingTasksReference.child(pendingTaskId).setValue(pendingTask)
-                        .addOnSuccessListener(aVoid -> Toast.makeText(context, "Yêu cầu xóa đã được gửi", Toast.LENGTH_SHORT).show())
-                        .addOnFailureListener(e -> Toast.makeText(context, "Lỗi khi gửi yêu cầu xóa: " + e.getMessage(), Toast.LENGTH_LONG).show());
+                        .addOnSuccessListener(aVoid -> {
+                            Toast.makeText(context, "Yêu cầu xóa đã được gửi", Toast.LENGTH_SHORT).show();
+                            // Cập nhật trạng thái trên bảng tasks
+                            databaseReference.child(task.getId()).child("status").setValue("pending_delete")
+                                    .addOnSuccessListener(aVoid2 -> {
+                                        android.util.Log.d("ItemTaskAdapter", "Task " + task.getTitle() + " đã chuyển sang trạng thái pending_delete");
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        android.util.Log.e("ItemTaskAdapter", "Lỗi khi cập nhật trạng thái pending_delete cho task " + task.getTitle() + ": " + e.getMessage());
+                                    });
+                        })
+                        .addOnFailureListener(e -> {
+                            Toast.makeText(context, "Lỗi khi gửi yêu cầu xóa: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                        });
             }
             dialog.dismiss();
         });
