@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Trường nhập tên thú cưng -->
+        <EditText
+            android:id="@+id/pet_name_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Tên thú cưng"
+            android:inputType="text" />
+
+        <!-- Trường nhập mô tả -->
+        <EditText
+            android:id="@+id/pet_description_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Mô tả"
+            android:inputType="textMultiLine"
+            android:minLines="3" />
+
+        <!-- Trường chọn ngày bằng DatePicker -->
+        <EditText
+            android:id="@+id/pet_date_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Ngày"
+            android:inputType="none"
+            android:focusable="false"
+            android:clickable="true" />
+
+        <!-- ImageView để hiển thị ảnh được chọn -->
+        <ImageView
+            android:id="@+id/pet_image_preview"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_gravity="center"
+            android:src="@drawable/pet_image"
+            android:scaleType="centerCrop" />
+
+        <!-- Nút chọn ảnh từ thư viện -->
+        <Button
+            android:id="@+id/select_image_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Chọn ảnh"
+            android:layout_gravity="center" />
+
+        <!-- Nút lưu dữ liệu -->
+        <Button
+            android:id="@+id/save_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Lưu" />
+
+    </LinearLayout>
+</ScrollView>

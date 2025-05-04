@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- Trường sửa tên thú cưng -->
+    <EditText
+        android:id="@+id/edit_pet_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Tên thú cưng" />
+
+    <!-- Trường sửa mô tả -->
+    <EditText
+        android:id="@+id/edit_pet_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Mô tả"
+        android:inputType="textMultiLine"
+        android:minLines="3" />
+
+    <!-- Trường sửa ngày -->
+    <EditText
+        android:id="@+id/edit_pet_date"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Ngày"
+        android:inputType="none"
+        android:focusable="false"
+        android:clickable="true" />
+
+    <!-- ImageView để hiển thị ảnh hiện tại -->
+    <ImageView
+        android:id="@+id/edit_pet_image"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_gravity="center"
+        android:src="@drawable/pet_image"
+        android:scaleType="centerCrop" />
+
+    <!-- Nút chọn ảnh mới -->
+    <Button
+        android:id="@+id/edit_select_image_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Chọn ảnh mới"
+        android:layout_gravity="center" />
+
+    <!-- Nút lưu thay đổi -->
+    <Button
+        android:id="@+id/save_edit_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Lưu" />
+
+</LinearLayout>

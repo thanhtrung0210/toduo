@@ -1,17 +1,16 @@
 package com.pipoxniko.toduo.model;
 
-public class FoodItem {
+public class PetItem {
     private String id;
     private String name;
     private String description;
     private String date;
     private String imageBase64;
 
-    public FoodItem() {
+    public PetItem() {
     }
 
-    public FoodItem(String id, String name, String description, String date, String imageBase64) {
-        this.id = id;
+    public PetItem(String name, String description, String date, String imageBase64) {
         this.name = name;
         this.description = description;
         this.date = date;

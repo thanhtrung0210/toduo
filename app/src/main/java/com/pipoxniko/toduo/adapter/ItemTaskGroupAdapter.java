@@ -64,11 +64,11 @@ public class ItemTaskGroupAdapter extends RecyclerView.Adapter<ItemTaskGroupAdap
             // Hiển thị hoặc ẩn RecyclerView dựa trên trạng thái isExpanded
             if (group.isExpanded()) {
                 holder.taskRecyclerView.setVisibility(View.VISIBLE);
-                holder.expandIcon.setImageResource(R.drawable.todolist_open_task_group); // Mũi tên lên
+                holder.expandIcon.setImageResource(R.drawable.todolist_close_task_group); // Mũi tên lên
                 Log.d("ItemTaskGroupAdapter", "Group " + group.getGroupName() + " is expanded, showing tasks");
             } else {
                 holder.taskRecyclerView.setVisibility(View.GONE);
-                holder.expandIcon.setImageResource(R.drawable.todolist_close_task_group); // Mũi tên xuống
+                holder.expandIcon.setImageResource(R.drawable.todolist_open_task_group); // Mũi tên xuống
                 Log.d("ItemTaskGroupAdapter", "Group " + group.getGroupName() + " is collapsed, hiding tasks");
             }
             holder.expandIcon.setVisibility(View.VISIBLE); // Hiển thị icon nếu có task
