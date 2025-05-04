@@ -193,8 +193,10 @@ public class TodolistCategoryFragment extends Fragment {
                             String taskId = taskSnapshot.getKey();
                             String taskCoupleId = taskSnapshot.child("couple_id").getValue(String.class);
                             String title = taskSnapshot.child("title").getValue(String.class);
-                            String categoryId = taskSnapshot.child("category_id").getValue(String.class);
+                            String description = taskSnapshot.child("description").getValue(String.class);
+                            String assignment = taskSnapshot.child("assignment").getValue(String.class);
                             String deadline = taskSnapshot.child("deadline").getValue(String.class);
+                            String categoryId = taskSnapshot.child("category_id").getValue(String.class);
                             Boolean completed = taskSnapshot.child("completed").getValue(Boolean.class);
                             String status = taskSnapshot.child("status").getValue(String.class);
                             String createdAt = taskSnapshot.child("created_at").getValue(String.class);
@@ -209,15 +211,19 @@ public class TodolistCategoryFragment extends Fragment {
                                 task.setId(taskId);
                                 task.setCoupleId(taskCoupleId);
                                 task.setTitle(title != null ? title : "Không có tiêu đề");
-                                task.setCategoryId(categoryId);
-                                task.setDeadline(deadline);
+                                task.setDescription(description != null ? description : null);
+                                task.setAssignment(assignment != null ? assignment : null);
+                                task.setDeadline(deadline != null ? deadline : null);
+                                task.setCategoryId(categoryId != null ? categoryId : null);
                                 task.setCompleted(completed != null ? completed : false);
                                 task.setStatus(status != null ? status : "normal");
-                                task.setCreatedAt(createdAt);
+                                task.setCreatedAt(createdAt != null ? createdAt : null);
                                 task.setChecked(task.isCompleted());
 
                                 taskCount++;
-                                Log.d("TodolistCategoryFragment", "Task found: " + task.getTitle() + ", Category ID: " + task.getCategoryId() + ", Completed: " + task.isCompleted());
+                                Log.d("TodolistCategoryFragment", "Task found: " + task.getTitle() + ", Description: " + task.getDescription() +
+                                        ", Assignment: " + task.getAssignment() + ", CategoryId: " + task.getCategoryId() +
+                                        ", Completed: " + task.isCompleted());
 
                                 if (categoryId != null && categoryMap.containsKey(categoryId)) {
                                     tasksByCategory.computeIfAbsent(categoryId, k -> new ArrayList<>()).add(task);

@@ -199,7 +199,10 @@ public class TodolistTimeFragment extends Fragment {
                     String taskId = taskSnapshot.getKey();
                     String taskCoupleId = taskSnapshot.child("couple_id").getValue(String.class);
                     String title = taskSnapshot.child("title").getValue(String.class);
+                    String description = taskSnapshot.child("description").getValue(String.class);
+                    String assignment = taskSnapshot.child("assignment").getValue(String.class);
                     String deadline = taskSnapshot.child("deadline").getValue(String.class);
+                    String categoryId = taskSnapshot.child("category_id").getValue(String.class);
                     Boolean completed = taskSnapshot.child("completed").getValue(Boolean.class);
                     String status = taskSnapshot.child("status").getValue(String.class);
                     String createdAt = taskSnapshot.child("created_at").getValue(String.class);
@@ -214,14 +217,19 @@ public class TodolistTimeFragment extends Fragment {
                         task.setId(taskId);
                         task.setCoupleId(taskCoupleId);
                         task.setTitle(title != null ? title : "Không có tiêu đề");
-                        task.setDeadline(deadline);
+                        task.setDescription(description != null ? description : null);
+                        task.setAssignment(assignment != null ? assignment : null);
+                        task.setDeadline(deadline != null ? deadline : null);
+                        task.setCategoryId(categoryId != null ? categoryId : null);
                         task.setCompleted(completed != null ? completed : false);
                         task.setStatus(status != null ? status : "normal");
-                        task.setCreatedAt(createdAt);
+                        task.setCreatedAt(createdAt != null ? createdAt : null);
                         task.setChecked(task.isCompleted());
 
                         taskCount++;
-                        Log.d("TodolistTimeFragment", "Task found: " + task.getTitle() + ", Deadline: " + task.getDeadline() + ", Completed: " + task.isCompleted());
+                        Log.d("TodolistTimeFragment", "Task found: " + task.getTitle() + ", Description: " + task.getDescription() +
+                                ", Assignment: " + task.getAssignment() + ", CategoryId: " + task.getCategoryId() +
+                                ", Deadline: " + task.getDeadline() + ", Completed: " + task.isCompleted());
 
                         if (task.getDeadline() == null) {
                             futureTasks.add(task);
