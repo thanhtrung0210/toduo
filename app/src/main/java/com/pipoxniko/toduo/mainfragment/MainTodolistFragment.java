@@ -507,6 +507,7 @@ public class MainTodolistFragment extends Fragment {
 
         task.put("category_id", selectedCategory != null ? selectedCategory.getId() : null);
         task.put("assignment", selectedAssignment != null ? selectedAssignment : "Cả hai");
+        task.put("completed", "false");
         task.put("status", "normal");
         task.put("created_at", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date()));
 

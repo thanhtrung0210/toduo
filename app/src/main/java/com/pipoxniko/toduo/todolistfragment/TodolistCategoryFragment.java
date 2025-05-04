@@ -41,17 +41,15 @@ public class TodolistCategoryFragment extends Fragment {
     private ItemTaskGroupAdapter groupAdapter;
     private DatabaseReference databaseReference;
     private String coupleId;
-    private AlertDialog loadingDialog; // Thêm dialog loading
+    private AlertDialog loadingDialog;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mView = inflater.inflate(R.layout.fragment_todolist_category, container, false);
 
-        // Gắn RecyclerView
         recyclerGroup = mView.findViewById(R.id.todolist_category_recycler_group);
 
-        // Tạo TextView để hiển thị thông báo "Chưa có công việc hoặc phân loại nào"
         emptyMessage = new TextView(getContext());
         emptyMessage.setText("Chưa có công việc hoặc phân loại nào");
         emptyMessage.setTextSize(16);
@@ -65,14 +63,12 @@ public class TodolistCategoryFragment extends Fragment {
 
         if (getContext() != null) {
             recyclerGroup.setLayoutManager(new LinearLayoutManager(getContext()));
-            recyclerGroup.setNestedScrollingEnabled(false); // Tắt cuộn của RecyclerView để NestedScrollView xử lý
+            recyclerGroup.setNestedScrollingEnabled(false);
         }
 
-        // Khởi tạo adapter
         groupAdapter = new ItemTaskGroupAdapter(groupList, getContext());
         recyclerGroup.setAdapter(groupAdapter);
 
-        // Khởi tạo dialog loading
         if (getActivity() != null) {
             View loadingView = inflater.inflate(R.layout.custom_loading_dialog, null);
             loadingDialog = new AlertDialog.Builder(getActivity())
@@ -82,11 +78,9 @@ public class TodolistCategoryFragment extends Fragment {
             loadingDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         }
 
-        // Khởi tạo Firebase
         databaseReference = FirebaseDatabase.getInstance().getReference("TODUO");
         String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-        // Lấy coupleId của người dùng
         databaseReference.child("users").child(currentUserId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -126,7 +120,6 @@ public class TodolistCategoryFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        // Đóng dialog loading nếu đang hiển thị
         if (loadingDialog != null && loadingDialog.isShowing()) {
             loadingDialog.dismiss();
         }
@@ -179,6 +172,7 @@ public class TodolistCategoryFragment extends Fragment {
                         }
 
                         Map<String, List<ItemTask>> tasksByCategory = new HashMap<>();
+                        List<ItemTask> otherTasks = new ArrayList<>(); // Thêm danh sách cho nhóm "Khác"
                         int taskCount = 0;
 
                         for (DataSnapshot taskSnapshot : snapshot.getChildren()) {
@@ -212,7 +206,8 @@ public class TodolistCategoryFragment extends Fragment {
                                 if (categoryId != null && categoryMap.containsKey(categoryId)) {
                                     tasksByCategory.computeIfAbsent(categoryId, k -> new ArrayList<>()).add(task);
                                 } else {
-                                    Log.d("TodolistCategoryFragment", "Task " + task.getTitle() + " không thuộc category nào phù hợp");
+                                    otherTasks.add(task); // Thêm task không có phân loại vào nhóm "Khác"
+                                    Log.d("TodolistCategoryFragment", "Task " + task.getTitle() + " được thêm vào nhóm Khác");
                                 }
                             } else {
                                 Log.d("TodolistCategoryFragment", "Bỏ qua task với ID: " + taskId + " do không khớp coupleId hoặc dữ liệu không đầy đủ");
@@ -228,6 +223,12 @@ public class TodolistCategoryFragment extends Fragment {
                             List<ItemTask> tasks = tasksByCategory.getOrDefault(categoryId, new ArrayList<>());
                             groupList.add(new ItemTaskGroup(categoryName, tasks));
                             Log.d("TodolistCategoryFragment", "Group created: " + categoryName + ", Task count: " + tasks.size());
+                        }
+
+                        // Thêm nhóm "Khác" nếu có task
+                        if (!otherTasks.isEmpty()) {
+                            groupList.add(new ItemTaskGroup("Khác", otherTasks));
+                            Log.d("TodolistCategoryFragment", "Group created: Khác, Task count: " + otherTasks.size());
                         }
 
                         groupAdapter.notifyDataSetChanged();
